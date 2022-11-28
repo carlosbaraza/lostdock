@@ -1,0 +1,51 @@
+{
+  "name": "lostdock",
+  "version": "0.0.0",
+  "bin": "dist/cli.js",
+  "engines": {
+    "node": ">=10"
+  },
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist",
+    "core-services"
+  ],
+  "scripts": {
+    "build": "tsup src/cli.tsx --format esm,cjs --dts",
+    "dev": "tsup src/cli.tsx --format esm,cjs --watch --dts",
+    "lint": "TIMING=1 eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "dependencies": {
+    "apache-md5": "^1.1.8",
+    "cosmiconfig": "^8.0.0",
+    "ink": "^3.2.0",
+    "ink-spinner": "^4.0.3",
+    "ink-text-input": "^4.0.3",
+    "lodash": "^4.17.21",
+    "meow": "^9.0.0",
+    "node-ssh": "^13.0.0",
+    "react": "^17.0.2",
+    "ssh2": "^1.11.0",
+    "zod": "^3.19.1"
+  },
+  "devDependencies": {
+    "@lostdock/tsconfig": "workspace:*",
+    "eslint-config-lostdock": "workspace:*",
+    "eslint": "^7.32.0",
+    "@ava/typescript": "^3.0.1",
+    "@types/lodash": "^4.14.190",
+    "@types/react": "^18.0.25",
+    "@types/ssh2": "^1.11.6",
+    "ava": "^5.1.0",
+    "chalk": "^4.1.2",
+    "eslint-plugin-react": "^7.31.11",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "ink-testing-library": "^2.1.0",
+    "typescript": "^4.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

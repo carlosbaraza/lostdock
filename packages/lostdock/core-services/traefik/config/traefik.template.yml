@@ -1,0 +1,51 @@
+log:
+  format: json
+  level: DEBUG
+
+accessLog:
+  format: json
+
+api:
+  insecure: false
+  dashboard: true
+  debug: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    network: proxy
+    swarmMode: false
+    exposedByDefault: false
+  # file:
+  #   filename: /certificates.yml
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: $LETSENCRYPT_EMAIL
+      storage: acme.json
+      
+      # Use HTTP-01 challenge. https://doc.traefik.io/traefik/https/acme/#httpchallenge
+      httpChallenge:
+        # used during the challenge
+        entryPoint: web
+      
+      # Use TLS-ALPN-01 challenge. https://doc.traefik.io/traefik/https/acme/#tlschallenge
+      # tlsChallenge: {}
+      
+      # DNS-01 Challenge could be used to generate wildcard certificates *.example.com
+      # https://doc.traefik.io/traefik/https/acme/#dnschallenge
+      # Many providers are supported. E.g. Cloudflare needs the CLOUDFLARE_DNS_API_TOKEN environment variable
+      # dnsChallenge:
+      #   provider: cloudflare
+      #   delayBeforeCheck: 0

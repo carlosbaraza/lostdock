@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/data
+    # ports:
+    #   - 9000:9000
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST}`)"
+      - 'traefik.http.routers.portainer.service=portainer'
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    
+networks:
+  proxy:
+    external: true

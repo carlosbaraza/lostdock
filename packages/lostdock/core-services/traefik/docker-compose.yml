@@ -1,0 +1,39 @@
+# Resources
+# configuration for traefik with letsencrypt https://community.traefik.io/t/adding-basic-auth-to-secure-traefik-dashboard-fails-otherwise-working-docker-compose/12286
+
+version: '3'
+
+services:
+  traefik:
+    # The official v2 Traefik docker image
+    image: traefik:v2.9
+    container_name: traefik
+    ports:
+      # The HTTP port
+      - "80:80"
+      - "443:443"
+      # The Web UI
+      # - "8080:8080" # Accessed vie traefik entrypoint (configured with labels below)
+    restart: unless-stopped
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certificates:/certificates:ro
+      - ./letsencrypt/acme.json:/acme.json
+      - ./config:/etc/traefik:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
+      - 'traefik.http.routers.traefik.service=api@internal'
+      - 'traefik.http.services.api.loadbalancer.server.port=8080'
+      - "traefik.http.middlewares.traefik.basicauth.users=${TRAEFIK_BASIC_AUTH}"
+      - "traefik.http.routers.traefik.middlewares=traefik"
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
