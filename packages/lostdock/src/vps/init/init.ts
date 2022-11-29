@@ -5,9 +5,12 @@ import { config } from "../../config";
 import { enableRemoteRsaKey, exec, getSshClient } from "../../utils/ssh/ssh";
 import { AsyncScript } from "../../utils/RunAsyncScript";
 import command from "./index";
+import { Writable, Readable, Transform } from "stream";
+import readline from "readline";
 
 export const init: AsyncScript<typeof command.definition.options> = async ({
   setStatus,
+  log,
   getOptionValue,
   setLoading,
 }) => {
@@ -27,14 +30,15 @@ export const init: AsyncScript<typeof command.definition.options> = async ({
     if (!error.message.includes("No such file")) throw error;
   }
 
-  setStatus("Uploading core services");
-  await ssh.putDirectory(
-    path.join(config.moduleRoot, "core-services"),
-    config.server.coreServicesPath
-  );
-  await exec(ssh, `mkdir -p ${config.server.stacksPath}`);
+  // setStatus("Uploading core services");
+  // await ssh.putDirectory(
+  //   path.join(config.moduleRoot, "core-services"),
+  //   config.server.coreServicesPath
+  // );
+  // await exec(ssh, `mkdir -p ${config.server.stacksPath}`);
 
   setStatus("Updating and installing dependencies");
+
   await exec(
     ssh,
     `
@@ -46,7 +50,8 @@ sudo apt-get install -y \
 	curl \
 	gnupg \
 	lsb-release \
-`
+`,
+    { log }
   );
 
   setStatus("Installing Docker");
@@ -61,7 +66,8 @@ echo \
 $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null;
 sudo apt-get update;
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin;
-`
+`,
+    { log }
   );
 
   setStatus("Installing Docker Loki Driver");
@@ -84,7 +90,8 @@ sudo tee /etc/docker/daemon.json <<EOF
 }
 EOF
 sudo systemctl restart docker
-`
+`,
+    { log }
   );
 
   setStatus("Starting Traefik");
@@ -112,6 +119,7 @@ docker compose up -d --force-recreate
 `,
     {
       cwd: config.server.coreServicesPath + "/traefik",
+      log,
     }
   );
 
@@ -139,6 +147,7 @@ docker compose up -d --force-recreate
 `,
     {
       cwd: config.server.coreServicesPath + "/monitoring",
+      log,
     }
   );
 
@@ -153,6 +162,7 @@ docker compose up -d --force-recreate
 `,
     {
       cwd: config.server.coreServicesPath + "/portainer",
+      log,
     }
   );
 
@@ -166,7 +176,8 @@ sudo ufw allow 22
 sudo ufw allow 80
 sudo ufw allow 443
 yes | sudo ufw enable
-`
+`,
+    { log }
   );
 
   setLoading(false);

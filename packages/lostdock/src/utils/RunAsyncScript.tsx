@@ -3,91 +3,112 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { config } from "../config";
 import { GetOptionValue } from "./prompt-missing-options";
-import { Text } from "ink";
+import { Box, Text } from "ink";
 import { getSshClient } from "../utils/ssh/ssh";
 import { NodeSSH } from "node-ssh";
 import chalk from "chalk";
 import { Option } from "./command/command";
+import { isNull } from "lodash";
 
 export type AsyncScript<
-	O extends Option<OptionKey>[],
-	OptionKey extends string = O[number]["key"],
-	C = AsyncScriptConfig<O, OptionKey>
+  O extends Option<OptionKey>[],
+  OptionKey extends string = O[number]["key"],
+  C = AsyncScriptConfig<O, OptionKey>
 > = (config: C) => void;
 
-export type AsyncScriptConfig<
-	O extends Option<OptionKey>[],
-	OptionKey extends string
-> = {
-	setStatus: (status: string) => void;
-	getOptionValue: GetOptionValue<O, any>;
-	setLoading: (loading: boolean) => void;
+export type AsyncScriptConfig<O extends Option<OptionKey>[], OptionKey extends string> = {
+  setStatus: (status: string) => void;
+  log: (logs: string | null) => void;
+  getOptionValue: GetOptionValue<O, any>;
+  setLoading: (loading: boolean) => void;
 };
 
-type AsyncScriptWithSSH<
-	O extends Option<OptionKey>[],
-	OptionKey extends string
-> = AsyncScript<
-	O,
-	OptionKey,
-	AsyncScriptConfig<O, OptionKey> & { ssh: NodeSSH }
+type AsyncScriptWithSSH<O extends Option<OptionKey>[], OptionKey extends string> = AsyncScript<
+  O,
+  OptionKey,
+  AsyncScriptConfig<O, OptionKey> & { ssh: NodeSSH }
 >;
 
 export function withSSH<
-	O extends Option<OptionKey>[],
-	OptionKey extends string = O[number]["key"],
-	S extends AsyncScriptWithSSH<O, OptionKey> = AsyncScriptWithSSH<O, OptionKey>
+  O extends Option<OptionKey>[],
+  OptionKey extends string = O[number]["key"],
+  S extends AsyncScriptWithSSH<O, OptionKey> = AsyncScriptWithSSH<O, OptionKey>
 >(script: S) {
-	const wrappedScript: AsyncScript<O, OptionKey> = async (props) => {
-		props.setStatus("Preparing SSH client");
-		const ssh = await getSshClient();
-		await script({ ...props, ssh });
-	};
-	return wrappedScript;
+  const wrappedScript: AsyncScript<O, OptionKey> = async (props) => {
+    props.setStatus("Preparing SSH client");
+    const ssh = await getSshClient();
+    await script({ ...props, ssh });
+  };
+  return wrappedScript;
 }
 
-export function RunAsyncScript<
-	O extends Option<OptionKey>[],
-	OptionKey extends string
->(props: {
-	getOptionValue: GetOptionValue<O, OptionKey>;
-	script: AsyncScript<O, OptionKey>;
+export function RunAsyncScript<O extends Option<OptionKey>[], OptionKey extends string>(props: {
+  getOptionValue: GetOptionValue<O, OptionKey>;
+  script: AsyncScript<O, OptionKey>;
 }) {
-	const [loading, setLoading] = useState(true);
-	const [message, setMessage] = useState("Starting");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("Starting");
+  const [logs, setLogs] = useState<string[]>([]);
 
-	const setStatus = (status: string) => {
-		setMessage((prevMessage) => {
-			if (prevMessage !== "Starting") {
-				console.log("✔ " + prevMessage);
-			}
-			return status;
-		});
-	};
+  const setStatus = (status: string) => {
+    setMessage((prevMessage) => {
+      if (prevMessage !== "Starting") {
+        console.log("✔ " + prevMessage);
+      }
+      return status;
+    });
+  };
 
-	useEffect(() => {
-		async function runScript() {
-			await props.script({
-				setLoading,
-				setStatus,
-				getOptionValue: props.getOptionValue,
-			});
+  function log(logLine: string | null) {
+    if (logLine) {
+      const cleanLine = logLine
+        .trim()
+        // Remove delete line characters
+        .replace(/[\x1b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 
-			setLoading(false);
-			setStatus(chalk.green("Done"));
-			process.exit(0);
-		}
-		runScript();
-	}, []);
+      if (cleanLine) {
+        setLogs((prevLogs) => [...prevLogs.slice(-9), cleanLine]);
+      }
+    } else if (isNull(logLine)) {
+      setLogs([]);
+    }
+  }
 
-	return (
-		<Text color="yellow">
-			{loading && !config.verbose ? (
-				<>
-					<Spinner type="dots" />{" "}
-				</>
-			) : null}
-			{message}
-		</Text>
-	);
+  useEffect(() => {
+    async function runScript() {
+      await props.script({
+        setLoading,
+        setStatus,
+        log,
+        getOptionValue: props.getOptionValue,
+      });
+
+      setLoading(false);
+      setStatus(chalk.green("Done"));
+      process.exit(0);
+    }
+    runScript();
+  }, []);
+
+  return (
+    <Box flexDirection="column">
+      <Text color="yellow">
+        {loading && !config.verbose ? (
+          <>
+            <Spinner type="dots" />{" "}
+          </>
+        ) : null}
+        {message}
+      </Text>
+      <Box minHeight={logs.length} flexDirection="column">
+        {!config.verbose && logs.length
+          ? logs.map((logLine, i) => (
+              <Text color="gray" wrap="wrap" key={`${logLine}-${i}`}>
+                {logLine}
+              </Text>
+            ))
+          : null}
+      </Box>
+    </Box>
+  );
 }
