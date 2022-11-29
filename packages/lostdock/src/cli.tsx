@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { command } from "./utils/command/command";
-import vps from "./vps/index";
+import server from "./server/index";
 import stacks from "./stacks/index";
 
 const { run } = command({
@@ -10,7 +10,7 @@ const { run } = command({
   description: "Deploy your docker compose stacks to a VPS",
   subcommands: [
     stacks,
-    vps,
+    server,
     {
       name: "init",
       description: "TODO: Create the initial .lostdockrc.json file",

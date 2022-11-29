@@ -5,8 +5,6 @@ import { config } from "../../config";
 import { enableRemoteRsaKey, exec, getSshClient } from "../../utils/ssh/ssh";
 import { AsyncScript } from "../../utils/RunAsyncScript";
 import command from "./index";
-import { Writable, Readable, Transform } from "stream";
-import readline from "readline";
 
 export const init: AsyncScript<typeof command.definition.options> = async ({
   setStatus,
@@ -30,15 +28,14 @@ export const init: AsyncScript<typeof command.definition.options> = async ({
     if (!error.message.includes("No such file")) throw error;
   }
 
-  // setStatus("Uploading core services");
-  // await ssh.putDirectory(
-  //   path.join(config.moduleRoot, "core-services"),
-  //   config.server.coreServicesPath
-  // );
-  // await exec(ssh, `mkdir -p ${config.server.stacksPath}`);
+  setStatus("Uploading core services");
+  await ssh.putDirectory(
+    path.join(config.moduleRoot, "core-services"),
+    config.server.coreServicesPath
+  );
+  await exec(ssh, `mkdir -p ${config.server.stacksPath}`);
 
   setStatus("Updating and installing dependencies");
-
   await exec(
     ssh,
     `
