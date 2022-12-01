@@ -8,7 +8,7 @@ export async function promptMissingOptions<O extends Option<K>[], K extends stri
   cli: any
 ) {
   const optionsToPrompt = flags
-    .filter((flag) => flag.prompt && !cli.flags[flag.key] && !flag.configValue)
+    .filter((flag) => flag.prompt && !cli.flags[flag.key] && !flag.configValue?.())
     .map((flag) => ({
       key: flag.key,
       name: flag.description,
