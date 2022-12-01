@@ -1,5 +1,13 @@
 # lostdock-traefik
 
+## 0.1.1
+
+### Patch Changes
+
+- 1d9a19d: Load the .env before running install-local.sh to avoid requiring the env variables multiple times
+- Updated dependencies [7f80d6f]
+  - lostdock@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
