@@ -6,6 +6,7 @@ if [[ "${TRACE-0}" == "1" ]]; then set -o xtrace; fi
 cd "$(dirname "$0")"
 
 main() {
+    local PORTAINER_HOST="${PORTAINER_HOST-$(./.env.sh get PORTAINER_HOST)}"
     if [[ -z "${PORTAINER_HOST-}" ]]; then
         echo "PORTAINER_HOST is not set"
         exit 1
