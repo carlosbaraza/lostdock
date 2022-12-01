@@ -1,4 +1,4 @@
-# lostdock
+# lostdock-monitoring
 
 ## 0.1.0
 
@@ -8,10 +8,6 @@
 
 ### Patch Changes
 
-- 92cf5fb: Show ssh command output preview
-
-## 0.0.1
-
-### Patch Changes
-
-- 17ca6b4: Initial implementation
+- Updated dependencies [fc804e9]
+- Updated dependencies [92cf5fb]
+  - lostdock@0.1.0
