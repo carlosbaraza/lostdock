@@ -3,28 +3,37 @@ import { config } from "../../config";
 import { readFileSync } from "fs";
 import { execSync } from "child_process";
 import { createLogPreviewStream } from "./log-preview";
+import chalk from "chalk";
 
 export async function getSshClient() {
   const ssh = new NodeSSH();
   await ssh.connect({
-    host: config.ssh.host,
-    username: config.ssh.username,
-    privateKey: readFileSync(config.ssh.privateKeyPath).toString(),
+    host: config().ssh.host,
+    username: config().ssh.user,
+    privateKey: readFileSync(config().ssh.privateKeyPath).toString(),
   });
   return ssh;
 }
 
-export async function enableRemoteRsaKey() {
+export async function enableRemoteRsaKey({
+  privateKeyPath,
+  user,
+  host,
+}: {
+  privateKeyPath: string;
+  user: string;
+  host: string;
+}) {
   // Using standard ssh cli as a child process, connect to the remote server
   // and enable the rsa key wirh PubkeyAcceptedKeyTypes=+ssh-rsa in the sshd_config
   // at /etc/ssh/sshd_config, only if the it is not already enabled. Then restart the sshd service.
   execSync(
     "ssh -i " +
-      config.ssh.privateKeyPath +
+      privateKeyPath +
       " " +
-      config.ssh.username +
+      user +
       "@" +
-      config.ssh.host +
+      host +
       ' \'if ! grep -q "PubkeyAcceptedKeyTypes=+ssh-rsa" /etc/ssh/sshd_config; then echo "PubkeyAcceptedKeyTypes=+ssh-rsa" | sudo tee -a /etc/ssh/sshd_config; sudo service sshd restart; fi\'',
     {
       stdio: "inherit",
@@ -39,22 +48,37 @@ export async function exec(
     cwd?: string;
     verbose?: boolean;
     log?: (log: string | null) => void;
+    exitOnError?: boolean;
   } = {}
 ) {
   const defaults = {
-    cwd: config.server.homePath,
-    verbose: config.verbose,
+    cwd: config().server.homePath,
+    verbose: config().verbose,
+    exitOnError: true,
   };
-  const { cwd, verbose, log } = { ...defaults, ...options };
-  let stream = log && createLogPreviewStream(log);
+  const { cwd, verbose, log, exitOnError } = { ...defaults, ...options };
+  const { logStream } = createLogPreviewStream(log);
+  if (verbose) {
+    console.log(chalk.gray(`Executing command: ` + command));
+  }
   const response = await ssh.execCommand(
-    `${config.verbose ? "set -x" : ""}
+    `${verbose ? "set -x" : ""}
 export DEBIAN_FRONTEND=noninteractive
 ${command}`,
     {
       cwd,
-      onStdout: (chunk) => (verbose ? process.stdout.write(chunk) : stream?.push(chunk)),
-      onStderr: (chunk) => (verbose ? process.stderr.write(chunk) : stream?.push(chunk)),
+      onStdout: (chunk) => {
+        logStream.push(chunk);
+        if (verbose) {
+          console.log(chalk.gray(chunk));
+        }
+      },
+      onStderr: (chunk) => {
+        logStream.push(chunk);
+        if (verbose) {
+          console.log(chalk.red(chunk));
+        }
+      },
       execOptions: {
         pty: true,
       },
@@ -62,6 +86,14 @@ ${command}`,
     }
   );
   log?.(null);
+
+  if (exitOnError && response.code !== 0) {
+    console.error(chalk.red(`Command "${command}" failed with exit code: ` + response.code));
+    console.error(chalk.red(response.stdout));
+    console.error(chalk.red(response.stderr));
+    process.exit(response.code || 1);
+  }
+
   return response;
 }
 

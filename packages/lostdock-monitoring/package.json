@@ -1,0 +1,11 @@
+{
+  "name": "lostdock-monitoring",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lostdock": "workspace:*"
+  }
+}

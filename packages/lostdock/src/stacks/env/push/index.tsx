@@ -9,30 +9,31 @@ import { RunAsyncScript } from "../../../utils/RunAsyncScript";
 import { script } from "./script";
 
 export default command({
-	name: "push",
-	usage: "lostdock stacks env push",
-	description: "Upload the local .env file",
-	subcommands: [],
-	options: [
-		{
-			key: "stack",
-			type: "string",
-			isRequired: false,
-			description: "stack name (e.g. example-stack-production)",
-			prompt: true,
-			configValue: config.stack.name,
-		},
-		{
-			key: "help",
-			alias: "h",
-			description: "Show help",
-			type: "boolean",
-		},
-	],
-	commandDepth: 3,
-	run: async (cli, command) => {
-		const { getOptionValue } = await promptMissingOptions(command.options, cli);
+  name: "push",
+  usage: "lostdock stacks env push",
+  description: "Upload the local .env file",
+  subcommands: [],
+  options: [
+    {
+      key: "stack",
+      type: "string",
+      alias: "s",
+      isRequired: false,
+      description: "stack name (e.g. example-stack-production)",
+      prompt: true,
+      configValue: () => config().stack.name,
+    },
+    {
+      key: "help",
+      alias: "h",
+      description: "Show help",
+      type: "boolean",
+    },
+  ],
+  commandDepth: 3,
+  run: async (cli, command) => {
+    const { getOptionValue } = await promptMissingOptions(command.options, cli);
 
-		render(<RunAsyncScript script={script} getOptionValue={getOptionValue} />);
-	},
+    render(<RunAsyncScript script={script} getOptionValue={getOptionValue} />);
+  },
 });

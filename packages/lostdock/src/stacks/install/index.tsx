@@ -9,16 +9,15 @@ import { RunAsyncScript } from "../../utils/RunAsyncScript";
 import { script } from "./script";
 
 export default command({
-  name: "push",
-  usage: "lostdock stacks push",
-  description: `Push the stack configuration to the server. All the files in the stack directory will be uploaded to the server. It is recommended to have a folder with the minimal data needed to run the stack: docker-compose.yml, .env, etc.`,
+  name: "install",
+  usage: "lostdock stacks install",
+  description: "Run `docker compose install` for the stack in the server",
   subcommands: [],
   options: [
     {
       key: "stack",
-      type: "string",
       alias: "s",
-      isRequired: false,
+      type: "string",
       description: "stack name (e.g. example-stack-production)",
       prompt: true,
       configValue: () => config().stack.name,

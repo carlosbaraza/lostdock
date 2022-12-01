@@ -3,8 +3,10 @@ import { Readable } from "stream";
 
 export function createLogPreviewStream(
   /** Callback would be called with a fix number of logs to preview */
-  log: (log: string) => void
+  log?: (log: string) => void
 ) {
+  let logs: string[] = [];
+
   const output = new Readable({
     read() {},
   });
@@ -12,6 +14,13 @@ export function createLogPreviewStream(
     input: output,
     crlfDelay: Infinity,
   });
-  outputLines.on("line", log);
-  return output;
+  outputLines.on("line", (line) => {
+    logs.push(line);
+    log?.(line);
+  });
+
+  return {
+    logs,
+    logStream: output,
+  };
 }

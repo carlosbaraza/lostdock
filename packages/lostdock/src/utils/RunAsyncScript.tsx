@@ -50,12 +50,15 @@ export function RunAsyncScript<O extends Option<OptionKey>[], OptionKey extends 
   const [message, setMessage] = useState("Starting");
   const [logs, setLogs] = useState<string[]>([]);
 
-  const setStatus = (status: string) => {
-    setMessage((prevMessage) => {
-      if (prevMessage !== "Starting") {
-        console.log("✔ " + prevMessage);
-      }
-      return status;
+  const setStatus = async (status: string) => {
+    return new Promise<void>((resolve) => {
+      setMessage((prevMessage) => {
+        if (prevMessage !== "Starting") {
+          console.log("✔ " + prevMessage);
+        }
+        return status;
+      });
+      setTimeout(resolve, 100);
     });
   };
 
@@ -93,22 +96,30 @@ export function RunAsyncScript<O extends Option<OptionKey>[], OptionKey extends 
   return (
     <Box flexDirection="column">
       <Text color="yellow">
-        {loading && !config.verbose ? (
+        {loading && !config({ validate: false }).verbose ? (
           <>
             <Spinner type="dots" />{" "}
           </>
         ) : null}
         {message}
       </Text>
-      <Box minHeight={logs.length} flexDirection="column">
-        {!config.verbose && logs.length
-          ? logs.map((logLine, i) => (
-              <Text color="gray" wrap="wrap" key={`${logLine}-${i}`}>
-                {logLine}
-              </Text>
-            ))
-          : null}
-      </Box>
+
+      {logs.length ? (
+        <Box
+          minHeight={logs.length}
+          flexDirection="column"
+          borderStyle="classic"
+          borderColor="gray"
+        >
+          {!config({ validate: false }).verbose && logs.length
+            ? logs.map((logLine, i) => (
+                <Text color="gray" wrap="wrap" key={`${logLine}-${i}`}>
+                  {logLine}
+                </Text>
+              ))
+            : null}
+        </Box>
+      ) : null}
     </Box>
   );
 }
