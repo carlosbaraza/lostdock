@@ -1,11 +1,12 @@
 import path from "path";
 import fs from "fs";
 import chalk from "chalk";
-import { enableRemoteRsaKey, exec, getSshClient } from "../utils/ssh/ssh";
-import { AsyncScript } from "../utils/RunAsyncScript";
+import { enableRemoteRsaKey, exec, getSshClient } from "../lib/ssh/ssh";
+import { AsyncScript } from "../lib/RunAsyncScript";
 import command from "./index";
-import { config } from "../config";
+import { config } from "../lib/config/config";
 import { NodeSSH } from "node-ssh";
+import { addLogin } from "../lib/config/logins";
 
 export const script: AsyncScript<typeof command.definition.options> = async ({
   setStatus,
@@ -47,10 +48,13 @@ export const script: AsyncScript<typeof command.definition.options> = async ({
   });
 
   setStatus(`Storing SSH connection configuration in "${config({ validate: false }).loginsPath}"`);
-  fs.writeFileSync(
-    config({ validate: false }).loginsPath,
-    JSON.stringify([{ ssh: { host, privateKeyPath, user } }], null, 2)
-  );
+  addLogin({
+    ssh: {
+      host,
+      privateKeyPath,
+      user,
+    },
+  });
 
   setLoading(false);
   setStatus(chalk.green("Success"));

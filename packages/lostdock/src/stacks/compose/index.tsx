@@ -2,11 +2,11 @@
 
 import { render } from "ink";
 import path from "path";
-import { config } from "../../config";
-import { command } from "../../utils/command/command";
-import { promptMissingOptions } from "../../utils/prompt-missing-options";
-import { RunAsyncScript, withSSH } from "../../utils/RunAsyncScript";
-import { exec } from "../../utils/ssh/ssh";
+import { config } from "../../lib/config/config";
+import { command } from "../../lib/command/command";
+import { promptMissingOptions } from "../../lib/prompt-missing-options";
+import { RunAsyncScript, withSSH } from "../../lib/RunAsyncScript";
+import { exec } from "../../lib/ssh/ssh";
 
 export default command({
   name: "compose",

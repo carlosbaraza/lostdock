@@ -1,4 +1,4 @@
-import { command } from "../utils/command/command";
+import { command } from "../lib/command/command";
 import init from "./init/index";
 
 export default command({

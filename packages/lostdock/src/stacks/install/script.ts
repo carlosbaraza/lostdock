@@ -1,19 +1,34 @@
 import chalk from "chalk";
+import { NodeSSH } from "node-ssh";
 import path from "path";
-import { config } from "../../config";
-import { execLocal } from "../../utils/exec-local";
-import { withSSH } from "../../utils/RunAsyncScript";
-import { exec } from "../../utils/ssh/ssh";
+import { config } from "../../lib/config/config";
+import { execLocal } from "../../lib/exec-local";
+import { withSSH } from "../../lib/RunAsyncScript";
+import { exec } from "../../lib/ssh/ssh";
 import command from "./index";
 
 export const script = withSSH<typeof command.definition.options>(async (options) => {
-  const { setStatus, getOptionValue, ssh } = options;
-  const stack = getOptionValue("stack");
-  const remotePath = path.join(config().server.stacksPath, stack);
+  const { setStatus, getOptionValue, ssh, log } = options;
+  const stackName = getOptionValue("stack");
+  await install({ setStatus, ssh, stackName, log });
+});
+
+export const install = async ({
+  setStatus,
+  ssh,
+  stackName,
+  log,
+}: {
+  setStatus: (status: string) => void;
+  ssh: NodeSSH;
+  stackName: string;
+  log: (message: string | null) => void;
+}) => {
+  const remotePath = path.join(config().server.stacksPath, stackName);
 
   setStatus('Running "install-local.sh" script');
   await execLocal("./install-local.sh", {
-    log: options.log,
+    log,
   });
 
   setStatus(`Uploading stack files to the server at "${remotePath}"`);
@@ -27,7 +42,7 @@ export const script = withSSH<typeof command.definition.options>(async (options)
       if (error) {
         console.error(chalk.red(`Error uploading "${localFile}" to "${remoteFile}"`));
       } else {
-        options.log(`Uploaded "${localFile}" to "${remoteFile}"`);
+        log(`Uploaded "${localFile}" to "${remoteFile}"`);
       }
     },
   });
@@ -35,16 +50,16 @@ export const script = withSSH<typeof command.definition.options>(async (options)
   setStatus('Running "install-server.sh" script');
   await exec(ssh, `chmod +x ./install-server.sh`, {
     cwd: remotePath,
-    log: options.log,
+    log,
   });
   await exec(ssh, `./install-server.sh`, {
     cwd: remotePath,
-    log: options.log,
+    log,
   });
 
   setStatus("Starting stack (docker compose up -d --force-recreate)");
   await exec(ssh, `docker compose up -d --force-recreate`, {
     cwd: remotePath,
-    log: options.log,
+    log,
   });
-});
+};

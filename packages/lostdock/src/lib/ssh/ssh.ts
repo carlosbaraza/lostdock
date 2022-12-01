@@ -1,5 +1,5 @@
 import { NodeSSH } from "node-ssh";
-import { config } from "../../config";
+import { config } from "../config/config";
 import { readFileSync } from "fs";
 import { execSync } from "child_process";
 import { createLogPreviewStream } from "./log-preview";
@@ -91,7 +91,7 @@ ${command}`,
     console.error(chalk.red(`Command "${command}" failed with exit code: ` + response.code));
     console.error(chalk.red(response.stdout));
     console.error(chalk.red(response.stderr));
-    process.exit(response.code || 1);
+    throw new Error(`Command "${command}" failed with exit code: ` + response.code);
   }
 
   return response;

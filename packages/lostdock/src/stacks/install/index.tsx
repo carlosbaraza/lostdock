@@ -2,16 +2,16 @@
 
 import { render } from "ink";
 import React from "react";
-import { config } from "../../config";
-import { command } from "../../utils/command/command";
-import { promptMissingOptions } from "../../utils/prompt-missing-options";
-import { RunAsyncScript } from "../../utils/RunAsyncScript";
+import { config } from "../../lib/config/config";
+import { command } from "../../lib/command/command";
+import { promptMissingOptions } from "../../lib/prompt-missing-options";
+import { RunAsyncScript } from "../../lib/RunAsyncScript";
 import { script } from "./script";
 
 export default command({
   name: "install",
   usage: "lostdock stacks install",
-  description: "Run `docker compose install` for the stack in the server",
+  description: "Install the current folder stack in your server",
   subcommands: [],
   options: [
     {

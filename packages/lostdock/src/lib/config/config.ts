@@ -5,11 +5,10 @@ import _ from "lodash";
 import z from "zod";
 import child_process from "child_process";
 import fs from "fs";
+import { getLogins } from "./logins";
 
 const explorerSync = cosmiconfigSync("lostdock");
 const searchedFor = explorerSync.search();
-
-const UNVALIDATED_COMMANDS = ["login", "logout"];
 
 const foo = <T>(x: T): T => x;
 foo(42);
@@ -42,13 +41,7 @@ function getValue<T, V extends boolean, S = T>(config: {
   return transform(parsedValue);
 }
 
-// make sure ~/.lostdock/logins.json exists, if not create it
-child_process.execSync(`mkdir -p ${os.homedir()}/.lostdock`);
-child_process.execSync(`touch ${os.homedir()}/.lostdock/logins.json`);
-const loginsPath = path.join(os.homedir(), ".lostdock", "logins.json");
-const logins = fs.readFileSync(loginsPath, "utf8") || "[]";
-const parsedLogins = JSON.parse(logins);
-const login = parsedLogins[0];
+const logins = getLogins();
 
 export const config = <V extends boolean = true>(options: { validate?: V } = {}) => {
   const validate = options?.validate ?? true;
@@ -57,7 +50,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
     host: getValue({
       env: "LOSTDOCK_SSH_HOST",
       rcPath: "ssh.host",
-      defaultValue: login?.ssh?.host as string | undefined,
+      defaultValue: logins.defaultLogin.ssh.host as string | undefined,
       schema: z.string().min(1),
       transform: (v) => v,
       validate,
@@ -65,7 +58,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
     user: getValue({
       env: "LOSTDOCK_SSH_USER",
       rcPath: "ssh.user",
-      defaultValue: login?.ssh?.user as string | undefined,
+      defaultValue: logins.defaultLogin.ssh.user as string | undefined,
       schema: z.string().min(1),
       transform: (v) => v,
       validate,
@@ -73,7 +66,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
     privateKeyPath: getValue({
       env: "LOSTDOCK_SSH_PRIVATE_KEY_PATH",
       rcPath: "ssh.privateKeyPath",
-      defaultValue: login?.ssh?.privateKeyPath as string | undefined,
+      defaultValue: logins.defaultLogin.ssh.privateKeyPath as string | undefined,
       schema: z.string().min(1),
       transform: (v) => v,
       validate,
@@ -84,6 +77,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
 
   return {
     ssh,
+    logins,
     server: {
       homePath,
       stacksPath: getValue({
@@ -115,7 +109,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
         validate,
       }),
     },
-    loginsPath,
+    loginsPath: logins.loginsPath,
     moduleRoot: path.resolve(__dirname, ".."),
   };
 };

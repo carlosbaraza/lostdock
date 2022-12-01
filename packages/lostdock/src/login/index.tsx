@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 
 import { render } from "ink";
-import { command } from "../utils/command/command";
-import { promptMissingOptions } from "../utils/prompt-missing-options";
-import { RunAsyncScript } from "../utils/RunAsyncScript";
+import { command } from "../lib/command/command";
+import { promptMissingOptions } from "../lib/prompt-missing-options";
+import { RunAsyncScript } from "../lib/RunAsyncScript";
 import { script } from "./script";
 import os from "os";
 import path from "path";
-import { config } from "../config";
+import { config } from "../lib/config/config";
+import setDefault from "./set-default";
 
 export default command({
   name: "login",
   usage: "lostdock login",
   description: "Login to your server. Store the login config in ~/.lostdock/logins.json",
-  subcommands: [],
+  subcommands: [setDefault],
   options: [
     {
       key: "host",
@@ -46,16 +47,27 @@ export default command({
       type: "boolean",
     },
     {
+      key: "list",
+      alias: "l",
+      description: "Show all saved login configurations",
+      type: "boolean",
+    },
+    {
       key: "help",
       alias: "h",
       description: "Show help",
       type: "boolean",
     },
   ],
-  commandDepth: 2,
+  commandDepth: 1,
   run: async (cli, command) => {
     if (cli.flags.whoami) {
-      console.log(JSON.stringify(config().ssh, null, 2));
+      console.log(JSON.stringify(config().logins.defaultLogin, null, 2));
+      process.exit(0);
+    }
+
+    if (cli.flags.list) {
+      console.log(JSON.stringify(config().logins.logins, null, 2));
       process.exit(0);
     }
 

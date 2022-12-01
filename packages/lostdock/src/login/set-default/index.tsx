@@ -1,27 +1,24 @@
 #!/usr/bin/env node
 
 import { render } from "ink";
-import React from "react";
-import { config } from "../../lib/config/config";
 import { command } from "../../lib/command/command";
 import { promptMissingOptions } from "../../lib/prompt-missing-options";
 import { RunAsyncScript } from "../../lib/RunAsyncScript";
 import { script } from "./script";
 
 export default command({
-  name: "push",
-  usage: "lostdock stacks push",
-  description: `Push the stack configuration to the server. All the files in the stack directory will be uploaded to the server. It is recommended to have a folder with the minimal data needed to run the stack: docker-compose.yml, .env, etc.`,
+  name: "set-default",
+  usage: "lostdock login set-default",
+  description: "Set default login from your logins: ~/.lostdock/logins.json",
   subcommands: [],
   options: [
     {
-      key: "stack",
+      key: "host",
       type: "string",
-      alias: "s",
       isRequired: false,
-      description: "stack name (e.g. example-stack-production)",
+      description:
+        "Your server's hostname (e.g. server.example.com). An IP address is also acceptable.",
       prompt: true,
-      configValue: () => config().stack.name,
     },
     {
       key: "help",
@@ -33,7 +30,6 @@ export default command({
   commandDepth: 2,
   run: async (cli, command) => {
     const { getOptionValue } = await promptMissingOptions(command.options, cli);
-
     render(<RunAsyncScript script={script} getOptionValue={getOptionValue} />);
   },
 });

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import shell from "shelljs";
-import { config } from "../config";
+import { config } from "./config/config";
 import { createLogPreviewStream } from "./ssh/log-preview";
 
 export async function execLocal(
@@ -48,7 +48,7 @@ export async function execLocal(
   if (exitOnError && exitCode !== 0) {
     console.error(chalk.red(`Command "${command}" failed with exit code: ` + exitCode));
     console.log(chalk.red(logs.join("\n")));
-    process.exit(exitCode || 1);
+    throw new Error(`Command "${command}" failed with exit code: ` + exitCode);
   }
 
   log?.(null);

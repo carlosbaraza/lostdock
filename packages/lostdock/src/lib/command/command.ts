@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import meow from "meow";
 import { AnyFlag } from "meow";
 
@@ -19,11 +20,32 @@ const renderSubcommands = (commands: Subcommand[]) => {
   if (!commands.length) return "";
   let output = "Commands:\n";
 
+  const terminalWidth = process.stdout.columns || 50;
+
   commands.forEach((command) => {
     const name = "name" in command ? command.name : command.definition.name;
     const description =
       "description" in command ? command.description : command.definition.description;
-    output += `  ${name.padEnd(20)} ${description}\n`;
+
+    const paddedName = `  ${`${name} `.padEnd(20, "·")} `;
+    const wrappedDescription = description
+      .split(" ")
+      .reduce((lines, word) => {
+        const rightMargin = 4;
+        const lastLine = lines[lines.length - 1];
+        if (
+          lastLine &&
+          lastLine.length + word.length + rightMargin + paddedName.length < terminalWidth
+        ) {
+          lines[lines.length - 1] += ` ${word}`;
+        } else {
+          lines.push(word);
+        }
+        return lines;
+      }, [] as string[])
+      .join(`\n${" ".repeat(paddedName.length)}`);
+
+    output += `${paddedName}${wrappedDescription}\n`;
   });
   return output;
 };
@@ -40,8 +62,8 @@ const renderOptions = (options: Option<string>[]) => {
   let output = "Options:\n";
   options.forEach((option) => {
     const alias = option.alias ? `-${option.alias}` : "";
-    const flag = `--${option.key} ${alias}`;
-    output += `  ${flag.padEnd(20)} ${option.description}\n`;
+    const flag = `--${option.key}${alias?.length ? `, ${alias}` : ""}`;
+    output += `  ${`${flag} `.padEnd(20, "·")} ${option.description}\n`;
   });
   return output;
 };
@@ -78,10 +100,10 @@ export function command<OptionKeys extends string, Options extends Option<Option
     const cli = meow(
       `${definition.header || ""}
 
-Usage
-  $ ${definition.usage}
+${chalk.yellow(`Usage
+  $ ${definition.usage}`)}
 
-${definition.description}
+${chalk.bold(definition.description)}
 
 ${renderSubcommands(definition.subcommands)}
 ${renderOptions(definition.options)}

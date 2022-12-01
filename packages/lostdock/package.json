@@ -18,6 +18,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
+    "@types/uuid": "^9.0.0",
     "apache-md5": "^1.1.8",
     "cosmiconfig": "^8.0.0",
     "ink": "^3.2.0",
@@ -29,6 +30,7 @@
     "react": "^17.0.2",
     "shelljs": "^0.8.5",
     "ssh2": "^1.11.0",
+    "uuid": "^9.0.0",
     "zod": "^3.19.1"
   },
   "devDependencies": {

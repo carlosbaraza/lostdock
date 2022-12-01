@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { render } from "ink";
-import { command } from "../../utils/command/command";
-import { promptMissingOptions } from "../../utils/prompt-missing-options";
-import { RunAsyncScript } from "../../utils/RunAsyncScript";
+import { command } from "../../lib/command/command";
+import { promptMissingOptions } from "../../lib/prompt-missing-options";
+import { RunAsyncScript } from "../../lib/RunAsyncScript";
 import { init } from "./init";
 
 export default command({

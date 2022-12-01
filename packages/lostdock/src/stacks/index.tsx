@@ -1,8 +1,9 @@
-import { command } from "../utils/command/command";
+import { command } from "../lib/command/command";
 import env from "./env/index";
 import push from "./push/index";
 import pull from "./pull/index";
 import install from "./install/index";
+import installFromGit from "./install-from-git/index";
 import up from "./up/index";
 import down from "./down/index";
 import compose from "./compose/index";
@@ -23,6 +24,7 @@ export default command({
     push,
     env,
     install,
+    installFromGit,
     up,
     down,
     compose,

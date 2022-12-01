@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import { config } from "../../config";
-import { AsyncScript } from "../../utils/RunAsyncScript";
-import { enableRemoteRsaKey, exec, getSshClient } from "../../utils/ssh/ssh";
+import { config } from "../../lib/config/config";
+import { AsyncScript } from "../../lib/RunAsyncScript";
+import { enableRemoteRsaKey, exec, getSshClient } from "../../lib/ssh/ssh";
 import command from "./index";
 
 export const init: AsyncScript<typeof command.definition.options> = async ({

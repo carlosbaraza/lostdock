@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { command } from "./utils/command/command";
+import { command } from "./lib/command/command";
 import server from "./server/index";
 import stacks from "./stacks/index";
 import login from "./login/index";

@@ -1,10 +1,10 @@
 import Spinner from "ink-spinner";
 import React from "react";
 import { useEffect, useState } from "react";
-import { config } from "../config";
+import { config } from "./config/config";
 import { GetOptionValue } from "./prompt-missing-options";
 import { Box, Text } from "ink";
-import { getSshClient } from "../utils/ssh/ssh";
+import { getSshClient } from "./ssh/ssh";
 import { NodeSSH } from "node-ssh";
 import chalk from "chalk";
 import { Option } from "./command/command";
