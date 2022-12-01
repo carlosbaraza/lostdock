@@ -1,5 +1,11 @@
 # lostdock
 
+## 0.2.1
+
+### Patch Changes
+
+- 86c9e46: Allow setting and unsetting env variables directly in the remote stack
+
 ## 0.2.0
 
 ### Minor Changes
