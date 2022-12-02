@@ -73,11 +73,10 @@ mkdir whoami-stack
 cd whoami-stack
 ```
 
-Create `docker-compose.yml` with a simple `traefik/whoami` service responding to the domain `whoami.example.com`. TLS certificates would be generated automatically for it using Let's Encrypt.
+Create a `docker-compose.yml` with a simple `traefik/whoami` service responding to the domain `whoami.example.com`. TLS certificates would be generated automatically for it using Let's Encrypt.
 
-```bash
-cat <<EOF
-version: '3.7'
+```yml
+version: "3.7"
 services:
   whoami:
     image: "traefik/whoami"
@@ -85,13 +84,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.example-1.rule=Host(`whoami.example.com`)"
-      - 'traefik.http.routers.example-1.service=example-1'
+      - "traefik.http.routers.example-1.service=example-1"
       - "traefik.http.routers.example-1.entrypoints=websecure"
       - "traefik.http.routers.example-1.tls=true"
       - "traefik.http.routers.example-1.tls.certresolver=letsencrypt"
       - "traefik.http.services.example-1.loadbalancer.server.port=9000"
-EOF
-" > docker-compose.yml
 ```
 
 Optionally, you can include the following:
