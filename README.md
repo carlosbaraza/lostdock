@@ -80,15 +80,15 @@ version: "3.7"
 services:
   whoami:
     image: "traefik/whoami"
-    container_name: "example-1"
+    container_name: "whoami"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.example-1.rule=Host(`whoami.example.com`)"
-      - "traefik.http.routers.example-1.service=example-1"
-      - "traefik.http.routers.example-1.entrypoints=websecure"
-      - "traefik.http.routers.example-1.tls=true"
-      - "traefik.http.routers.example-1.tls.certresolver=letsencrypt"
-      - "traefik.http.services.example-1.loadbalancer.server.port=9000"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.example.com`)"
+      - "traefik.http.routers.whoami.service=whoami"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whoami.loadbalancer.server.port=9000"
 ```
 
 Optionally, you can include the following:
