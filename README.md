@@ -1,75 +1,144 @@
-# Turborepo Design System starter with Changesets
+[![lostdock github social banner](./apps/docs/public/lostdock-banner/lostdock-banner-1280x640.png)](https://lostdock.com)
 
-This is an official React design system starter powered by Turborepo. Versioning and package publishing is handled by [Changesets](https://github.com/changesets/changesets) and fully automated with GitHub Actions.
+# lostdock
 
-## What's inside?
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/carlosbaraza/lostdock/Release/main)
+![GitHub](https://img.shields.io/github/license/carlosbaraza/lostdock)
+![npm](https://img.shields.io/npm/v/lostdock)
 
-This Turborepo includes the following:
+`lostdock` is a simple command line tool that allows managing a server running multiple `docker compose` stacks. Cheap (money and time) deployment solution for the underserved small startup.
 
-### Apps and Packages
+- `lostdock` is a thin wrapper around `docker compose` with some handy tools to init a server, set env variables, install pre-configured stacks, etc. However, the core is just `docker compose` and a few bash scripts in your stack folder, so it is very easy to stop using if ever needed. Just SSH into your server and run `docker compose` in the `~/stacks/your-stack` folder.
+- Bonus: replace expensive PaaS/SaaS tools with pre-configured open source stacks for [log and metric aggregation](./packages/lostdock-monitoring), [reverse proxy](./packages/lostdock-traefik), [container management](./packages/lostdock-portainer), and more.
 
-- `docs`: A placeholder documentation site powered by [Next.js](https://nextjs.org/)
-- `@lostdock/utils`: shared React utilities
-- `@lostdock/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `eslint-config-lostdock`: ESLint preset
+## Installation
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+In your local environment:
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx degit vercel/turbo/examples/with-changesets with-changesets
-cd with-changesets
-pnpm install
-git init . && git add . && git commit -m "Init"
+```bash
+npm i -G lostdock
 ```
 
-### Useful commands
+## Getting started
 
-- `yarn build` - Build all packages and the docs site
-- `yarn dev` - Develop all packages and the docs site
-- `yarn lint` - Lint all packages
-- `yarn changeset` - Generate a changeset
-- `yarn clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
+Prerequisites:
 
-### Changing the npm organization scope
+- A VPS with your SSH key allowed to login as root. We recommend creating a new VPS first with a cheap provider that gives you a static IPv4 address.
 
-The npm organization scope for this design system starter is `@lostdock`. To change this, it's a bit manual at the moment, but you'll need to do the following:
+Install CLI in your local environment:
 
-- Rename folders in `packages/*` to replace `lostdock` with your desired scope
-- Search and replace `lostdock` with your desired scope
-- Re-run `yarn install`
-
-## Versioning and Publishing packages
-
-Package publishing has been configured using [Changesets](https://github.com/changesets/changesets). Please review their [documentation](https://github.com/changesets/changesets#documentation) to familiarize yourself with the workflow.
-
-This example comes with automated npm releases setup in a [GitHub Action](https://github.com/changesets/action). To get this working, you will need to create an `NPM_TOKEN` and `GITHUB_TOKEN` in your repository settings. You should also install the [Changesets bot](https://github.com/apps/changeset-bot) on your GitHub repository as well.
-
-For more information about this automation, refer to the official [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md)
-
-### npm
-
-If you want to publish package to the public npm registry and make them publicly available, this is already setup.
-
-To publish packages to a private npm organization scope, **remove** the following from each of the `package.json`'s
-
-```diff
-- "publishConfig": {
--  "access": "public"
-- },
+```bash
+npm i -G lostdock
 ```
 
-### GitHub Package Registry
+Configure lostdock with your SSH connection details:
 
-See [Working with the npm registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#publishing-a-package-using-publishconfig-in-the-packagejson-file)
+```bash
+lostdock login
+```
+
+Install Docker, Docker compose, some dependencies and start the firewall.
+
+```bash
+lostdock server init
+```
+
+Run the traefik reverse proxy. You need a wildcard A record `*.example.com` pointing to your server IPv4 address.
+
+```bash
+export TRAEFIK_HOST=traefik.example.com
+
+# Basic auth: admin:admin
+# Generated with `echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g`
+# Double dollar signs are required in Docker Compose
+export TRAEFIK_BASIC_AUTH='admin:$$apr1$$QWfIwdTB$$tTTke28GgXk790t3agoKm.'
+
+export LETSENCRYPT_EMAIL=example@example.com
+
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-traefik
+```
+
+After these, you should be able to access your Traefik Dashboard at `traefik.example.com`. (user: `admin`, password: `admin`)
+
+You can deploy many other pre-configured stacks using the same commands. We recommend you install the following stacks too: [lostdock-monitoring (log and metric aggregation and visualization stack)](./packages/lostdock-monitoring) and [lostdock-portainer (container management)](./packages/lostdock-portainer)
+
+### Deploying your first stack
+
+Create a new folder for your stack and `cd` into it:
+
+```
+mkdir whoami-stack
+cd whoami-stack
+```
+
+Create `docker-compose.yml` with a simple `traefik/whoami` service responding to the domain `whoami.example.com`. TLS certificates would be generated automatically for it using Let's Encrypt.
+
+```bash
+cat <<EOF
+version: '3.7'
+services:
+  whoami:
+    image: "traefik/whoami"
+    container_name: "example-1"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.example-1.rule=Host(`whoami.example.com`)"
+      - 'traefik.http.routers.example-1.service=example-1'
+      - "traefik.http.routers.example-1.entrypoints=websecure"
+      - "traefik.http.routers.example-1.tls=true"
+      - "traefik.http.routers.example-1.tls.certresolver=letsencrypt"
+      - "traefik.http.services.example-1.loadbalancer.server.port=9000"
+EOF
+" > docker-compose.yml
+```
+
+Optionally, you can include the following:
+
+- A `.env` file with the environment variables to use in your `docker-compose.yml` file.
+- A `./install-local.sh` file executed before installing to validate configuration
+- A `./install-server.sh` file executed in the server before running `docker compose up` for the first time. This is a good opportunity to create some volumes, external docker networks, file structures, permissions, etc.
+
+When you are ready, run `lostdock stacks install`, and `lostdock` will do the following:
+
+- Run `./install-local.sh` (validate configuration)
+- Push stack
+- Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
+- Run `docker compose up`.
+
+Finally, clarify that you can easily stop using `lostdock`. You can always SSH into your server and keep using `docker compose` bare bones.
+
+## Why old school VPS and `docker compose`?
+
+The key insight is that **Virtual Private Servers are cheap, but your time is not**. If only we could easily setup/maintain a server and deploy many apps in it... we could iterate fast.
+
+- A cheap $5/month server can handle an incredible amount of load. If needed it could scale vertically, although most projects would never see that much traffic.
+- Distributing pre-configured stacks becomes trivial if you set a flexible enough standard. We can replace many expensive SaaS tools like Datadog. For example [lostdock-monitoring (log and metric aggregation and visualization stack)](./packages/lostdock-monitoring), [lostdock-traefik (reverse proxy)](./packages/lostdock-traefik) and [lostdock-portainer (container management)](./packages/lostdock-portainer).
+- PaaS like Vercel, Fly, Heroku are useful, but not a general target for any kind of application. Hooking multiple microservices, databases, etc is hard and bug prone (compared to a simple `docker-compose.yml`).
+- Kubernetes and other orchestration software are complex, and the benefits are only apparent in big organizations with large teams and projects. Small startups are underserved.
+- Docker is the de-facto standard nowadays. The tooling is really mature and stable, and it is quite simple to package any type of application into a docker image.
+
+## Example features
+
+Refer to the [full documentation at lostdock.com](https://lostdock.com) for an exhaustive list of features.
+This is just a summary of some key commands to give you a feeling for the tool.
+
+- `lostdock login`: Configure your SSH connection
+- `lostdock server init`: install docker and docker compose on a new server
+- `lostdock stacks install`:
+  - Run `./install-local.sh` (validate configuration)
+  - Push stack
+  - Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
+  - Run `docker compose up`.
+- `lostdock stacks install-from-git`: Same than install, but from a github repository including a `docker-compose.yml`. Useful to share pre-configured stacks.
+- `lostdock stacks`: Manage stacks
+- `lostdock stacks env`: Environment variable management
+- `lostdock stacks up`: Start/Restart the stack
+- `lostdock stacks down`: Stop the stack
+
+Please refer to the [full documentation at lostdock.com](https://lostdock.com)
+
+## License
+
+MIT
