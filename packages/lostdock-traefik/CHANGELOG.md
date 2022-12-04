@@ -1,5 +1,12 @@
 # lostdock-traefik
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [52af6e1]
+  - lostdock@0.3.0
+
 ## 0.1.2
 
 ### Patch Changes
