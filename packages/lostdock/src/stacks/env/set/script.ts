@@ -8,6 +8,7 @@ import { getRemoteFile } from "../../../lib/ssh/get-remote-file";
 import { putRemoteFile } from "../../../lib/ssh/put-remote-file";
 import command from "./index";
 import { exec } from "../../../lib/ssh/ssh";
+import { promisify } from "util";
 
 export const script = withSSH<typeof command.definition.options>(async (options) => {
   const { setStatus, getOptionValue, ssh, log } = options;
@@ -19,7 +20,8 @@ export const script = withSSH<typeof command.definition.options>(async (options)
 
   if (local) {
     const envPath = path.join(process.cwd(), ".env");
-    const env = dotenvParse(fs.readFileSync(envPath, "utf-8"));
+    const envContent = await promisify(fs.readFile)(envPath, "utf-8").catch(() => "");
+    const env = dotenvParse(envContent);
     env[key] = value;
     fs.writeFileSync(envPath, dotenvFormat(env));
     return;

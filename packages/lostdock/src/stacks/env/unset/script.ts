@@ -1,3 +1,4 @@
+import { promisify } from "util";
 import path from "path";
 import fs from "fs";
 import { config } from "../../../lib/config/config";
@@ -18,7 +19,8 @@ export const script = withSSH<typeof command.definition.options>(async (options)
 
   if (local) {
     const envPath = path.join(process.cwd(), ".env");
-    const env = dotenvParse(fs.readFileSync(envPath, "utf-8"));
+    const envContent = await promisify(fs.readFile)(envPath, "utf-8").catch(() => "");
+    const env = dotenvParse(envContent);
     delete env[key];
     fs.writeFileSync(envPath, dotenvFormat(env));
     return;
