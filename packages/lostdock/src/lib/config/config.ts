@@ -50,7 +50,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
     host: getValue({
       env: "LOSTDOCK_SSH_HOST",
       rcPath: "ssh.host",
-      defaultValue: logins.defaultLogin.ssh.host as string | undefined,
+      defaultValue: logins.defaultLogin?.ssh.host,
       schema: z.string().min(1),
       transform: (v) => v,
       validate,
@@ -58,7 +58,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
     user: getValue({
       env: "LOSTDOCK_SSH_USER",
       rcPath: "ssh.user",
-      defaultValue: logins.defaultLogin.ssh.user as string | undefined,
+      defaultValue: logins.defaultLogin?.ssh.user,
       schema: z.string().min(1),
       transform: (v) => v,
       validate,
@@ -66,7 +66,7 @@ export const config = <V extends boolean = true>(options: { validate?: V } = {})
     privateKeyPath: getValue({
       env: "LOSTDOCK_SSH_PRIVATE_KEY_PATH",
       rcPath: "ssh.privateKeyPath",
-      defaultValue: logins.defaultLogin.ssh.privateKeyPath as string | undefined,
+      defaultValue: logins.defaultLogin?.ssh.privateKeyPath,
       schema: z.string().min(1),
       transform: (v) => v,
       validate,
