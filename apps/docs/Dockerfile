@@ -25,7 +25,7 @@ RUN pnpm i --frozen-lockfile
 COPY --from=installer /app/out/full/ .
 COPY turbo.json turbo.json
 # Build app and all dependencies with ...
-RUN pnpm build -- --filter=@lostdock/docs...
+RUN pnpm build --filter=...@lostdock/docs
 RUN pnpm prune --production
 
 FROM node:16.17.1-alpine AS runner
