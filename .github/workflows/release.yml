@@ -93,6 +93,6 @@ jobs:
           lostdock stacks env set --local --key HOSTNAME --value lostdock.com
           lostdock stacks env set --local --key VERSION --value ${{ env.VERSION }}
           lostdock stacks env set --local --key ENV --value production
-          lostdock stacks env push
+          lostdock stacks push
           lostdock stacks up
   
