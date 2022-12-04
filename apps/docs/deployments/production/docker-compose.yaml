@@ -1,0 +1,26 @@
+version: '3.8'
+networks:
+  proxy:
+    external: true
+services:
+  lostdock-docs:
+    image: lostdock/docs:${VERSION}
+    env_file:
+      - ./.env
+    restart: always
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lostdock-docs-${ENV}.rule=Host(`${HOSTNAME}`)"
+      - 'traefik.http.routers.lostdock-docs-${ENV}.service=lostdock-docs-${ENV}'
+      - "traefik.http.routers.lostdock-docs-${ENV}.entrypoints=websecure"
+      - "traefik.http.routers.lostdock-docs-${ENV}.tls=true"
+      - "traefik.http.services.lostdock-docs-${ENV}.loadbalancer.server.port=3000"
+    depends_on:
+      - ip-db
+      - ip-redis
+    deploy:
+      mode: replicated
+      replicas: 2
+      endpoint_mode: vip

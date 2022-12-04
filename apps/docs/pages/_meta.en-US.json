@@ -1,0 +1,50 @@
+{
+  "index": {
+    "title": "Introduction",
+    "type": "page",
+    "display": "hidden"
+  },
+  "docs": {
+    "title": "Docs",
+    "type": "page",
+    "theme": {
+      "toc": true
+    }
+  },
+  "about": {
+    "title": "About",
+    "type": "menu",
+    "items": {
+      "contributors": {
+        "title": "Contributors",
+        "href": "https://github.com/carlosbaraza/lostdock/graphs/contributors",
+        "newWindow": true
+      }
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "type": "page",
+    "theme": {
+      "sidebar": false,
+      "toc": true,
+      "footer": true,
+      "breadcrumb": false,
+      "typesetting": "article"
+    }
+  },
+  "404": {
+    "type": "page",
+    "theme": {
+      "timestamp": false,
+      "typesetting": "article"
+    }
+  },
+  "500": {
+    "type": "page",
+    "theme": {
+      "timestamp": false,
+      "typesetting": "article"
+    }
+  }
+}

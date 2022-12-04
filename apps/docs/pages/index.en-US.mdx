@@ -1,0 +1,121 @@
+---
+title: React Hooks for Data Fetching
+searchable: false
+---
+
+import Features from '@components/features'
+import { Tabs, Tab, Callout } from 'nextra-theme-docs'
+
+{
+// wrapped with {} to mark it as javascript so mdx will not put it under a p tag
+}
+{<h1 className="text-center font-extrabold md:text-5xl mt-8">lostdock</h1>}
+
+<Features/>
+
+## Installation
+
+```bash
+npm install -g lostdock
+```
+
+## Overview
+
+### Init a server
+
+Create a new Debian/Ubuntu VPS in your preferred cloud provider. Then init the server:
+
+```bash
+# After creating a new VPS, login via SSH
+lostdock login
+
+# Install Docker Compose and start the firewall.
+lostdock server init
+```
+
+### Deploying
+
+<Tabs items={['Deploy stack from GitHub', 'Deploy your own stack']} defaultIndex={0}>
+  <Tab>
+Once you have a server running. Run stack from GitHub. For example, let's run a reverse proxy with auto generated TLS certificates:
+
+```bash
+export TRAEFIK_HOST=traefik.example.com
+# Generated with: echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g
+export TRAEFIK_BASIC_AUTH='admin:$$apr1$$QWfIwdTB$$tTTke28GgXk790t3agoKm.'
+export LETSENCRYPT_EMAIL=example@example.com
+
+# Start Traefik reverse proxy
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-traefik
+```
+
+We also recommend running the following stacks: [lostdock-monitoring](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-monitoring) (log and metric aggregation and visualization stack) and [lostdock-portainer](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-portainer) (container management).
+
+  </Tab>
+  <Tab>
+    You can also deploy your own stack. Supposing you are running the `lostdock-traefik` stack. Expose a `traefik/whoami` service at whoami.example.com:
+
+```yaml filename="docker-compose.yml"
+version: '3.7'
+services:
+  whoami:
+    image: "traefik/whoami"
+    container_name: "whoami"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.lostdock.com`)"
+      - 'traefik.http.routers.whoami.service=whoami'
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whoami.loadbalancer.server.port=9000"
+```
+
+```bash
+lostdock stacks install
+```
+
+      It will perform the following actions:
+
+
+      - Run `./install-local.sh` (validate configuration)
+      - Push stack configuration files to server
+      - Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
+      - Run `docker compose up`.
+
+      </Tab>
+
+  </Tabs>
+
+<div className="mt-16 mb-20 text-center">
+  [Get Started](/docs/getting-started) · [Blog](/blog) · [GitHub Repository](https://github.com/carlosbaraza/lostdock)
+</div>
+
+## Features
+
+`lostdock` gives you a nice set of tools to make deploying `docker compose` stacks to a VPS easier. Some of the features are:
+
+- `lostdock server init`: Install Docker and Docker Compose on a fresh VPS server
+- `lostdock stacks install`: Deploy a stack to a server
+- `lostdock stacks install-from-git`: Deploy stack from a GitHub repository including a `docker-compose.yml`. Useful to share pre-configured stacks.
+- `lostdock stacks`: Manage stack configuration, environment variables, start, stop, restart, etc.
+- Multiple extremely useful stacks:
+  - [lostdock-traefik](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-traefik): Reverse proxy with auto generated TLS certificates
+  - [lostdock-monitoring](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-monitoring): Log and metric aggregation and visualization stack. Grafana, Loki, Prometheus, cAdvisor, Node Exporter, alertmanager, and more.
+  - [lostdock-portainer](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-portainer): Container management. Web UI to manage your Docker environments, stacks & containers with ease.
+
+And a lot [more](/docs/getting-started).
+
+## Community
+
+<p className="flex gap-2 h-6 mt-6">
+  <img alt="stars" src="https://badgen.net/github/stars/carlosbaraza/lostdock" />
+  <img alt="downloads" src="https://badgen.net/npm/dt/lostdock" />
+  <img alt="license" src="https://badgen.net/npm/license/lostdock" />
+</p>
+
+Lostdock is an open source project initially developed by [@carlosbaraza](https://twitter.com/carlosbaraza). If you like it, please consider starring it on [GitHub](https://github.com/carlosbaraza/lostdock).
+
+Feel free to join the [discussions on GitHub](https://github.com/carlosbaraza/lostdock/discussions)!

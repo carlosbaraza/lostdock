@@ -8,15 +8,13 @@
 
 `lostdock` is a simple command line tool that allows managing a server running multiple `docker compose` stacks. Cheap (money and time) deployment solution for the underserved small startup.
 
-- `lostdock` is a thin wrapper around `docker compose` with some handy tools to init a server, set env variables, install pre-configured stacks, etc. However, the core is just `docker compose` and a few bash scripts in your stack folder, so it is very easy to stop using if ever needed. Just SSH into your server and run `docker compose` in the `~/stacks/your-stack` folder.
-- Bonus: replace expensive PaaS/SaaS tools with pre-configured open source stacks for [log and metric aggregation](./packages/lostdock-monitoring), [reverse proxy](./packages/lostdock-traefik), [container management](./packages/lostdock-portainer), and more.
+- Replace expensive PaaS/SaaS tools with pre-configured open source stacks for [log and metric aggregation](./packages/lostdock-monitoring), [reverse proxy](./packages/lostdock-traefik), [container management](./packages/lostdock-portainer), and more.
 
 ## Installation
 
-In your local environment:
-
 ```bash
-npm i -G lostdock
+# In your local environment
+npm install -g lostdock
 ```
 
 ## Getting started
@@ -28,7 +26,7 @@ Prerequisites:
 Install CLI in your local environment:
 
 ```bash
-npm i -G lostdock
+npm install -g lostdock
 ```
 
 Configure lostdock with your SSH connection details:
@@ -68,7 +66,7 @@ You can deploy many other pre-configured stacks using the same commands. We reco
 
 Create a new folder for your stack and `cd` into it:
 
-```
+```bash
 mkdir whoami-stack
 cd whoami-stack
 ```
@@ -100,41 +98,49 @@ Optionally, you can include the following:
 When you are ready, run `lostdock stacks install`, and `lostdock` will do the following:
 
 - Run `./install-local.sh` (validate configuration)
-- Push stack
+- Push stack configuration files to server
 - Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
 - Run `docker compose up`.
 
 Finally, clarify that you can easily stop using `lostdock`. You can always SSH into your server and keep using `docker compose` bare bones.
 
-## Why old school VPS and `docker compose`?
+## Features
 
-The key insight is that **Virtual Private Servers are cheap, but your time is not**. If only we could easily setup/maintain a server and deploy many apps in it... we could iterate fast.
+`lostdock` gives you a nice set of tools to make deploying `docker compose` stacks to a VPS easier. Some of the features are:
 
-- A cheap $5/month server can handle an incredible amount of load. If needed it could scale vertically, although most projects would never see that much traffic.
-- Distributing pre-configured stacks becomes trivial if you set a flexible enough standard. We can replace many expensive SaaS tools like Datadog. For example [lostdock-monitoring (log and metric aggregation and visualization stack)](./packages/lostdock-monitoring), [lostdock-traefik (reverse proxy)](./packages/lostdock-traefik) and [lostdock-portainer (container management)](./packages/lostdock-portainer).
-- PaaS like Vercel, Fly, Heroku are useful, but not a general target for any kind of application. Hooking multiple microservices, databases, etc is hard and bug prone (compared to a simple `docker-compose.yml`).
-- Kubernetes and other orchestration software are complex, and the benefits are only apparent in big organizations with large teams and projects. Small startups are underserved.
-- Docker is the de-facto standard nowadays. The tooling is really mature and stable, and it is quite simple to package any type of application into a docker image.
-
-## Example features
+- `lostdock server init`: Install Docker and Docker Compose on a fresh VPS server
+- `lostdock stacks install`: Deploy a stack to a server
+- `lostdock stacks install-from-git`: Deploy stack from a GitHub repository including a `docker-compose.yml`. Useful to share pre-configured stacks.
+- `lostdock stacks`: Manage stack configuration, environment variables, start, stop, restart, etc.
+- Multiple extremely useful stacks:
+  - [lostdock-traefik](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-traefik): Reverse proxy with auto generated TLS certificates
+  - [lostdock-monitoring](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-monitoring): Log and metric aggregation and visualization stack. Grafana, Loki, Prometheus, cAdvisor, Node Exporter, alertmanager, and more.
+  - [lostdock-portainer](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-portainer): Container management. Web UI to manage your Docker environments, stacks & containers with ease.
 
 Refer to the [full documentation at lostdock.com](https://lostdock.com) for an exhaustive list of features.
-This is just a summary of some key commands to give you a feeling for the tool.
 
-- `lostdock login`: Configure your SSH connection
-- `lostdock server init`: install docker and docker compose on a new server
-- `lostdock stacks install`:
-  - Run `./install-local.sh` (validate configuration)
-  - Push stack
-  - Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
-  - Run `docker compose up`.
-- `lostdock stacks install-from-git`: Same than install, but from a github repository including a `docker-compose.yml`. Useful to share pre-configured stacks.
-- `lostdock stacks`: Manage stacks
-- `lostdock stacks env`: Environment variable management
-- `lostdock stacks up`: Start/Restart the stack
-- `lostdock stacks down`: Stop the stack
+## FAQs
 
-Please refer to the [full documentation at lostdock.com](https://lostdock.com)
+### How could I stop using lostdock?
+
+`lostdock` is a thin wrapper around `docker compose` with some handy tools to init a server, set env variables, install pre-configured stacks, etc. However, the core is just `docker compose` and a few bash scripts in your stack folder, so it is very easy to stop using if ever needed. Just SSH into your server and run `docker compose` in the `~/stacks/your-stack` folder.
+
+### Why old school VPS and `docker compose`?
+
+The key insight is that **Virtual Private Servers are cheap, but your time is not**. If only we could easily setup/maintain a server and deploy many apps in it.
+
+Some unordered thoughts that brought me to this solution:
+
+- A cheap $5/month server can handle an incredible amount of load. If needed it could scale vertically, although most projects would never see that much traffic.
+- A lot have changed since VPS run out of popularity.
+  - We exhausted ourselves with messy admin heavy deployments (manual dependency management, conflicting dependencies, manual migrations, manual DB admin, manual process management, etc).
+  - Docker changed it for good, with nice packages that contain all that is needed to run your application without conflicts. Now your problem is orchestrating Docker containers (solved by `docker compose` among many others).
+- Distributing pre-configured stacks becomes trivial if you set a flexible enough standard (e.g. Kubernetes Helm). We can replace many expensive SaaS tools like Datadog. For example [lostdock-monitoring (log and metric aggregation and visualization stack)](./packages/lostdock-monitoring), [lostdock-traefik (reverse proxy)](./packages/lostdock-traefik) and [lostdock-portainer (container management)](./packages/lostdock-portainer).
+- PaaS like Vercel, Fly, Heroku are useful, but not a general target for any kind of application. Hooking multiple microservices, databases, etc is hard and bug prone (compared to a simple `docker-compose.yml`).
+- Kubernetes and other orchestration software are complex, and the benefits are only apparent in big organizations with large teams and projects. Small startups are underserved.
+- Docker is the de-facto standard for containers nowadays.
+  - The tooling is really mature and stable after some buggy beginnings that created myths about how reliable containers are.
+  - It is quite simple to package any type of application into a docker image. You can even run databases.
 
 ## License
 

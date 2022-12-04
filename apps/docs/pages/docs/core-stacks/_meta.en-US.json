@@ -1,0 +1,9 @@
+{
+  "--- Core Stacks": {
+    "title": "Core Stacks",
+    "type": "separator"
+  },
+  "lostdock-traefik": "lostdock-traefik",
+  "lostdock-monitoring": "lostdock-monitoring",
+  "lostdock-portainer": "lostdock-portainer"
+}

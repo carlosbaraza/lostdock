@@ -10,5 +10,12 @@ export const script = withSSH<typeof command.definition.options>(async (options)
 
   const remoteEnvPath = path.join(config().server.stacksPath, stack, ".env");
   setStatus(`Getting stack .env "${remoteEnvPath}"`);
-  await ssh.getFile(".env", remoteEnvPath);
+  try {
+    await ssh.getFile(".env", remoteEnvPath);
+  } catch (error: any) {
+    if (getOptionValue("silent") && error?.message?.includes("No such file")) {
+      return;
+    }
+    throw error;
+  }
 });

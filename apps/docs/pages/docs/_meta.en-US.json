@@ -1,0 +1,31 @@
+{
+  "--- hey": {
+    "title": "Getting Started",
+    "type": "separator"
+  },
+  "getting-started": "Getting Started",
+  "setup-vps": "Setup new VPS",
+  "deploy-pre-configured-stacks": "Deploy pre-configured stacks",
+  "core-stacks": {
+    "title": "Core Stacks"
+  },
+  "deploy-your-stacks": "Deploy your stacks",
+  "stack-management-basics": "Stack management basics",
+  "--- my_new_separator": {
+    "title": "Advanced",
+    "type": "separator"
+  },
+  "quit-lostdock": "Quit lostdock. Core Internals",
+  "change-log": {
+    "title": "Change Log",
+    "theme": {
+      "sidebar": false
+    }
+  },
+  "github_link": {
+    "title": "GitHub 🐙 →",
+    "href": "https://github.com/shuding/nextra",
+    "type": "page",
+    "newWindow": true
+  }
+}

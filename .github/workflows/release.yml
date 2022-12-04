@@ -37,3 +37,62 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
+  publish-docs:
+    needs: release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: 0.0.0-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          # config: ${{ secrets.SSH_CONFIG }} # ssh_config; optional
+          if_key_exists: replace # replace / ignore / fail; optional (defaults to fail)
+      
+      # Setup node
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.17.1
+      - name: Update package.json VERSION
+        run: node -e 'var fs=require("fs"); var p=require("./package.json"); p.version=process.env.VERSION; fs.writeFileSync("./package.json", JSON.stringify(p, null, 2));'
+
+      # Build image
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3.1.1
+        with:
+          context: .
+          file: './apps/docs/Dockerfile'
+          push: true
+          tags: |
+            lostdock/docs:latest
+            lostdock/docs:${{ env.VERSION }}
+      
+      # Deploy to server
+      - run: |
+          cd ./apps/docs/deployments/production
+          npm i -g lostdock
+          lostdock login --host lostdock.com --privateKeyPath ~/.ssh/id_rsa
+          lostdock stacks env pull --silent
+          lostdock stacks env set --local --key HOSTNAME --value lostdock.com
+          lostdock stacks env set --local --key VERSION --value ${{ env.VERSION }}
+          lostdock stacks env set --local --key ENV --value production
+          lostdock stacks env push
+          lostdock stacks up
+  

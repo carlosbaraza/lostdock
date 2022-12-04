@@ -24,6 +24,15 @@ export default command({
       configValue: () => config().stack.name,
     },
     {
+      key: "silent",
+      type: "boolean",
+      alias: "s",
+      isRequired: false,
+      description: "Don't fail if the .env file doesn't exist",
+      default: false,
+      prompt: false,
+    },
+    {
       key: "help",
       alias: "h",
       description: "Show help",

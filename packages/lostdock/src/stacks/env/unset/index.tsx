@@ -33,6 +33,14 @@ export default command({
       configValue: () => config().stack.name,
     },
     {
+      key: "local",
+      type: "boolean",
+      alias: "l",
+      isRequired: false,
+      description: "Set the local .env (default: set remotely only)",
+      default: false,
+    },
+    {
       key: "help",
       alias: "h",
       description: "Show help",

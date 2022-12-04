@@ -14,21 +14,30 @@ export const script = withSSH<typeof command.definition.options>(async (options)
 
   const stack = getOptionValue("stack");
   const key = getOptionValue("key");
+  const local = getOptionValue("local");
 
-  const remotePath = path.join(config().server.stacksPath, stack);
-  const remoteEnvPath = path.join(remotePath, ".env");
-  setStatus(`Getting stack .env "${remoteEnvPath}"`);
-  const dotenv = await getRemoteFile(ssh, remoteEnvPath);
+  if (local) {
+    const envPath = path.join(process.cwd(), ".env");
+    const env = dotenvParse(fs.readFileSync(envPath, "utf-8"));
+    delete env[key];
+    fs.writeFileSync(envPath, dotenvFormat(env));
+    return;
+  } else {
+    const remotePath = path.join(config().server.stacksPath, stack);
+    const remoteEnvPath = path.join(remotePath, ".env");
+    setStatus(`Getting stack .env "${remoteEnvPath}"`);
+    const dotenv = await getRemoteFile(ssh, remoteEnvPath);
 
-  setStatus(`Removing key "${key}" from remote stack .env "${remoteEnvPath}"`);
-  let newDotenv = dotenvParse(dotenv);
-  delete newDotenv[key];
-  const formattedEnv = dotenvFormat(newDotenv);
-  await putRemoteFile(ssh, remoteEnvPath, formattedEnv);
+    setStatus(`Removing key "${key}" from remote stack .env "${remoteEnvPath}"`);
+    let newDotenv = dotenvParse(dotenv);
+    delete newDotenv[key];
+    const formattedEnv = dotenvFormat(newDotenv);
+    await putRemoteFile(ssh, remoteEnvPath, formattedEnv);
 
-  setStatus("Restarting stack (docker compose up -d --force-recreate)");
-  await exec(ssh, `docker compose up -d --force-recreate`, {
-    cwd: remotePath,
-    log,
-  });
+    setStatus("Restarting stack (docker compose up -d --force-recreate)");
+    await exec(ssh, `docker compose up -d --force-recreate`, {
+      cwd: remotePath,
+      log,
+    });
+  }
 });
