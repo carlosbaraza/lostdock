@@ -1,5 +1,11 @@
 # lostdock
 
+## 0.3.2
+
+### Patch Changes
+
+- ab11574: Fix issue setting env variables when no .env exists
+
 ## 0.3.1
 
 ### Patch Changes
