@@ -1,5 +1,11 @@
 # lostdock
 
+## 0.3.0
+
+### Minor Changes
+
+- 52af6e1: Add bare docs, fix cli npm package, add support for local env modification
+
 ## 0.2.1
 
 ### Patch Changes
