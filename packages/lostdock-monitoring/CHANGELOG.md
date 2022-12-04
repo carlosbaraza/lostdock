@@ -1,5 +1,12 @@
 # lostdock-monitoring
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [51882ce]
+  - lostdock@0.3.1
+
 ## 0.1.3
 
 ### Patch Changes
