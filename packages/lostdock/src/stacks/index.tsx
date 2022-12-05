@@ -6,29 +6,14 @@ import install from "./install/index";
 import installFromGit from "./install-from-git/index";
 import up from "./up/index";
 import down from "./down/index";
+import create from "./create/index";
 import compose from "./compose/index";
 
 export default command({
   name: "stacks",
   usage: "lostdock stacks <command>",
   description: "Manage your stacks on the server",
-  subcommands: [
-    {
-      name: "create",
-      description: "TODO: Create a new stack folder with Docker Compose example.",
-      run: () => {
-        console.log("TODO: Create a new stack folder with Docker Compose example.");
-      },
-    },
-    pull,
-    push,
-    env,
-    install,
-    installFromGit,
-    up,
-    down,
-    compose,
-  ],
+  subcommands: [create, pull, push, env, install, installFromGit, up, down, compose],
   options: [
     {
       key: "help",

@@ -10,19 +10,7 @@ const { run } = command({
   name: "lostdock",
   usage: "lostdock <command>",
   description: "Deploy your docker compose stacks to a VPS",
-  subcommands: [
-    stacks,
-    server,
-    {
-      name: "init",
-      description: "TODO: Create the initial .lostdockrc.json file",
-      run: () => {
-        console.log("TODO: Create the initial .lostdockrc.json file");
-      },
-    },
-    login,
-    logout,
-  ],
+  subcommands: [stacks, server, login, logout],
   options: [
     {
       key: "help",

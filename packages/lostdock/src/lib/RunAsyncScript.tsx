@@ -88,7 +88,6 @@ export function RunAsyncScript<O extends Option<OptionKey>[], OptionKey extends 
 
       setLoading(false);
       setStatus(chalk.green("Done"));
-      process.exit(0);
     }
     runScript();
   }, []);
