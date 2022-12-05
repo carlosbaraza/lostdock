@@ -17,9 +17,6 @@ services:
       - "traefik.http.routers.lostdock-docs-${ENV}.entrypoints=websecure"
       - "traefik.http.routers.lostdock-docs-${ENV}.tls=true"
       - "traefik.http.services.lostdock-docs-${ENV}.loadbalancer.server.port=3000"
-    depends_on:
-      - ip-db
-      - ip-redis
     deploy:
       mode: replicated
       replicas: 2
