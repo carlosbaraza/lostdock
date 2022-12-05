@@ -41,4 +41,4 @@ USER nextjs
 
 COPY --from=builder --chown=nextjs:nodejs /app .
 
-CMD ["pnpm", "run", "start", "--filter=@lostdock/docs"]
+CMD ["pnpm", "--dir ./apps/docs", "run", "start"]
