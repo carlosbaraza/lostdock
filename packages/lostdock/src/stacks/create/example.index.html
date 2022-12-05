@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LostDock Example</title>
+    <style>
+      /** Reset */
+      html {
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      p,
+      ol,
+      ul {
+        margin: 0;
+        padding: 0;
+        font-weight: normal;
+      }
+
+      ol,
+      ul {
+        list-style: none;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /** Custom */
+      body {
+        width: 100vw;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif;
+        background-color: #f5f5f5;
+        text-align: center;
+        line-height: 1.5;
+        padding: 20px;
+      }
+
+      h1 {
+        font-weight: bold;
+      }
+
+      .inline-code {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background-color: #ccc;
+        border-radius: 0.5rem;
+        font-family: monospace;
+      }
+
+      .content {
+        max-width: 600px;
+        background: #eaeaea;
+        padding: 40px;
+        border-radius: 40px;
+      }
+
+      .content > * + * {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <h1>LostDock Example</h1>
+      <p>
+        Welcome to your first example <a href="https://lostdock.com">lostdock</a> stack. You can
+        change the <span class="inline-code">src/index.html</span> file to customize this page.
+      </p>
+      <p>
+        You can change the <span class="inline-code">docker-compose.yml</span> stack configuration
+        to deploy your own Docker image.
+      </p>
+      <p>
+        Please, check out our
+        <a href="https://lostdock.com">documentation</a> and our
+        <a href="https://github.com/carlosbaraza/lostdock">lostdock GitHub repository</a> for any
+        questions you might have. We are building a strong community to support you.
+      </p>
+    </div>
+  </body>
+</html>
