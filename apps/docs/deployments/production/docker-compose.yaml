@@ -16,6 +16,7 @@ services:
       - 'traefik.http.routers.lostdock-docs-${ENV}.service=lostdock-docs-${ENV}'
       - "traefik.http.routers.lostdock-docs-${ENV}.entrypoints=websecure"
       - "traefik.http.routers.lostdock-docs-${ENV}.tls=true"
+      - "traefik.http.routers.lostdock-docs-${ENV}.tls.certresolver=letsencrypt"
       - "traefik.http.services.lostdock-docs-${ENV}.loadbalancer.server.port=3000"
     deploy:
       mode: replicated
