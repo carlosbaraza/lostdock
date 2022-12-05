@@ -41,4 +41,4 @@ USER nextjs
 
 COPY --from=builder --chown=nextjs:nodejs /app .
 
-CMD ["pnpm", "--dir ./apps/docs", "run", "start"]
+CMD ["pnpm", "--dir=./apps/docs", "run", "start"]
