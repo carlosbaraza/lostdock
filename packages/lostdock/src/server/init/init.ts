@@ -70,5 +70,7 @@ yes | sudo ufw enable
 
   setLoading(false);
   setStatus(chalk.green("Done"));
-  process.exit(0);
+  setTimeout(() => {
+    process.exit(0);
+  }, 500);
 };

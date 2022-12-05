@@ -4,6 +4,7 @@ import { command } from "./lib/command/command";
 import server from "./server/index";
 import stacks from "./stacks/index";
 import login from "./login/index";
+import logout from "./logout/index";
 
 const { run } = command({
   name: "lostdock",
@@ -20,13 +21,7 @@ const { run } = command({
       },
     },
     login,
-    {
-      name: "logout",
-      description: "TODO: Log out from your server",
-      run: () => {
-        console.log("TODO: Log out from your server");
-      },
-    },
+    logout,
   ],
   options: [
     {

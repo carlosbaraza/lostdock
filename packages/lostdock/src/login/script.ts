@@ -58,5 +58,7 @@ export const script: AsyncScript<typeof command.definition.options> = async ({
 
   setLoading(false);
   setStatus(chalk.green("Success"));
-  process.exit(0);
+  setTimeout(() => {
+    process.exit(0);
+  }, 500);
 };
