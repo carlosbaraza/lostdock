@@ -1,5 +1,14 @@
 # lostdock
 
+## 0.3.3
+
+### Patch Changes
+
+- 0a4c0d7: Add logout functionality
+- 2781811: Add create command
+- 6903e5b: fix: small isseu with some commands not finishing
+- d23540f: Fix the create example
+
 ## 0.3.2
 
 ### Patch Changes
