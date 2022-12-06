@@ -84,8 +84,8 @@ jobs:
             lostdock/docs:latest
             lostdock/docs:${{ env.VERSION }}
       
-      # Deploy to server
-      - run: |
+      - name: Deploy to server
+        run: |
           cd ./apps/docs/deployments/production
           npm i -g lostdock
           lostdock login --host lostdock.com --privateKeyPath ~/.ssh/id_rsa
