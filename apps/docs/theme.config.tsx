@@ -33,7 +33,8 @@ const Vercel = () => (
 );
 
 const TITLE = {
-  "en-US": "React Hooks for Data Fetching",
+  "en-US":
+    "Easy and affordable deployments to your own VPS with Docker Compose",
 };
 
 const EDIT_TEXT = {
