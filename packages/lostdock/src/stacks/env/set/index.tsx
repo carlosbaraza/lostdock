@@ -21,7 +21,6 @@ export default command({
       isRequired: false,
       description: "The environment variable key",
       prompt: true,
-      configValue: () => config().stack.name,
     },
     {
       key: "value",
@@ -30,7 +29,6 @@ export default command({
       isRequired: false,
       description: "The environment variable value",
       prompt: true,
-      configValue: () => config().stack.name,
     },
     {
       key: "stack",
@@ -47,6 +45,14 @@ export default command({
       alias: "l",
       isRequired: false,
       description: "Set the local .env (default: set remotely only)",
+      default: false,
+    },
+    {
+      key: "restart",
+      type: "boolean",
+      alias: "r",
+      isRequired: false,
+      description: "Restart the stack after setting the environment variable",
       default: false,
     },
     {

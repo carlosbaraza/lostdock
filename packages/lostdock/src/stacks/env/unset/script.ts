@@ -16,6 +16,7 @@ export const script = withSSH<typeof command.definition.options>(async (options)
   const stack = getOptionValue("stack");
   const key = getOptionValue("key");
   const local = getOptionValue("local");
+  const restart = getOptionValue("restart");
 
   if (local) {
     const envPath = path.join(process.cwd(), ".env");
@@ -36,10 +37,14 @@ export const script = withSSH<typeof command.definition.options>(async (options)
     const formattedEnv = dotenvFormat(newDotenv);
     await putRemoteFile(ssh, remoteEnvPath, formattedEnv);
 
-    setStatus("Restarting stack (docker compose up -d --force-recreate)");
-    await exec(ssh, `docker compose up -d --force-recreate`, {
-      cwd: remotePath,
-      log,
-    });
+    if (restart) {
+      setStatus("Restarting stack (docker compose up -d --force-recreate)");
+      await exec(ssh, `docker compose up -d --force-recreate`, {
+        cwd: remotePath,
+        log,
+      });
+    } else {
+      setStatus("Skipping restart. You can manually restart the stack with `lostdock stacks up`");
+    }
   }
 });

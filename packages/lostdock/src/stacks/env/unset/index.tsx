@@ -41,6 +41,14 @@ export default command({
       default: false,
     },
     {
+      key: "restart",
+      type: "boolean",
+      alias: "r",
+      isRequired: false,
+      description: "Restart the stack after setting the environment variable",
+      default: false,
+    },
+    {
       key: "help",
       alias: "h",
       description: "Show help",
