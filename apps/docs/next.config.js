@@ -41,11 +41,6 @@ module.exports = withNextra({
         statusCode: 301,
       },
       {
-        source: "/blog/swr-1",
-        destination: "/blog/swr-v1",
-        statusCode: 301,
-      },
-      {
         source: "/docs.([a-zA-Z-]+)",
         destination: "/docs/getting-started",
         statusCode: 302,

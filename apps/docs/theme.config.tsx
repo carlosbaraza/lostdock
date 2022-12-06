@@ -41,7 +41,7 @@ const EDIT_TEXT = {
 };
 
 const FOOTER_LINK = {
-  "en-US": "https://vercel.com/?utm_source=swr",
+  "en-US": "https://lostdock.com",
 };
 
 const FOOTER_LINK_TEXT = {
@@ -86,7 +86,7 @@ const config: DocsThemeConfig = {
   useNextSeoProps() {
     const { locale } = useRouter();
     return {
-      titleTemplate: `%s | SWR (${locale})`,
+      titleTemplate: `%s | lostdock.com (${locale})`,
     };
   },
   gitTimestamp: ({ timestamp }) => <>Last updated on {timestamp.toString()}</>,
@@ -94,10 +94,10 @@ const config: DocsThemeConfig = {
     const config = useConfig();
     const description =
       config.frontMatter.description ||
-      "SWR is a React Hooks library for data fetching. SWR first returns the data from cache (stale), then sends the fetch request (revalidate), and finally comes with the up-to-date data again.";
+      "CLI tool to manage an affordable VPS server and deploy multiple applications powered by `docker compose`. Other orchestration software solutions are too complex for the underserved small startup. Get started in 2 minutes.";
     const image =
       config.frontMatter.image ||
-      "https://assets.vercel.com/image/upload/v1572282926/swr/twitter-card.jpg";
+      "https://lostdock.com/lostdock-banner/lostdock-banner-1280x640.png";
     return (
       <>
         {/* Favicons, meta */}
@@ -124,16 +124,24 @@ const config: DocsThemeConfig = {
           href="/favicon/safari-pinned-tab.svg"
           color="#000000"
         />
+        <link rel="shortcut icon" href="/favicon/favicon.ico" />
+        <meta name="apple-mobile-web-app-title" content="lostdock" />
+        <meta name="application-name" content="lostdock" />
         <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta
+          name="msapplication-config"
+          content="/favicon/browserconfig.xml"
+        />
+        <meta name="theme-color" content="#ffffff" />
         <meta httpEquiv="Content-Language" content="en" />
         <meta name="description" content={description} />
         <meta name="og:description" content={description} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@vercel" />
+        <meta name="twitter:site" content="@carlosbaraza" />
         <meta name="twitter:image" content={image} />
-        <meta name="og:title" content={`${config.title} – SWR`} />
+        <meta name="og:title" content={`${config.title} – lostdock.com`} />
         <meta name="og:image" content={image} />
-        <meta name="apple-mobile-web-app-title" content="SWR" />
+        <meta name="apple-mobile-web-app-title" content="lostdock.com" />
       </>
     );
   },
