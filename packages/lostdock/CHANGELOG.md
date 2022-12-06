@@ -1,5 +1,11 @@
 # lostdock
 
+## 0.3.5
+
+### Patch Changes
+
+- 81cf942: fix: installing a dependency without install scripts was failing
+
 ## 0.3.4
 
 ### Patch Changes
