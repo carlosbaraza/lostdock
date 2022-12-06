@@ -1,5 +1,11 @@
 # lostdock
 
+## 0.4.0
+
+### Minor Changes
+
+- cf89c24: Add restart flag to stacks env. Fix small issue with missing key option.
+
 ## 0.3.5
 
 ### Patch Changes
