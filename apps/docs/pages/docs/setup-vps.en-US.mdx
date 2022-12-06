@@ -2,4 +2,51 @@ import { Callout } from 'nextra-theme-docs'
 
 # Setup new VPS
 
-To do
+## First, create a new VPS
+
+We recommend starting from scratch with a new VPS from your favourite cloud provider. If you already have a VPS, you can skip this step.
+
+<Callout>
+    We built the init script with **Ubuntu/Debian** in mind, so it might not work on other distributions. If you're using a different distribution, you can still use the init script as a reference or contribute to the project to support your distribution.
+</Callout>
+
+## Login to the server with SSH
+
+When you created the server, ensure that you have a SSH key pair configured to login to the server. The SSH key is usually located in `~/.ssh/id_rsa.pub` on your local machine.
+
+Login to the server:
+
+```bash
+# Login to the server. It will prompt you for the host.
+lostdock login
+```
+
+```markdown
+  Usage
+    $ lostdock login
+
+  Login to your server. Store the login config in ~/.lostdock/logins.json
+
+  Commands:
+    set-default ········ Set default login from your logins: ~/.lostdock/logins.json
+
+  Options:
+    --host ············· Your server's hostname (e.g. server.example.com). An IP address is also acceptable.
+    --user ············· Your SSH username (e.g. root).
+    --privateKeyPath ··· Your SSH private key (e.g. ~/.ssh/id_rsa).
+    --whoami, -w ······· Show current login configuration
+    --list, -l ········· Show all saved login configurations
+    --help, -h ········· Show help
+```
+
+## Init the server
+
+The init script will install some dependencies, update your packages, install Docker, Docker Compose and configure the firewall.
+
+```bash
+lostdock server init
+```
+
+## Deploy your first stack
+
+Now that you have a working server, you can [deploy a pre-configured stack](/docs/deploy-pre-configured-stacks) or [your own stack](/docs/deploy-your-stacks).

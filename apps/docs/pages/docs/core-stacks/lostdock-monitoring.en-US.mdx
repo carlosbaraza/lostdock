@@ -2,4 +2,41 @@ import { Callout } from 'nextra-theme-docs'
 
 # lostdock-monitoring
 
-TODO
+We preconfigured a stack to ease monitoring and log aggregation. Multiple metrics are automatically collected from your
+server and every docker container. All the logs produced by each container are aggregated using Promtail and Loki in the
+same Grafana environment.
+
+<Callout>
+    We highly encourage you to install this stack. It will help you to monitor your running stacks, produce alerts, and explore the logs.
+    We completely replaced our use of Datadog with this stack. It's a great alternative to Datadog, and it's free.
+</Callout>
+
+## Usage
+
+```bash
+export GRAFANA_HOST=grafana.example.com
+export NETDATA_HOST=netdata.example.com
+export NETDATA_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
+
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-monitoring
+```
+
+## Features
+
+- The tools that are included are:
+  - `Grafana`: visualize and explore metrics and logs
+  - `Prometheus`: collect metrics from your server and containers, shipped automatically to Grafana
+  - `Loki`, `Promtail`: automatic log aggregation from your server
+  - `Netdata`: extremely useful UI to manage the server
+  - `Alertmanager`: manage alerts produced from your metrics
+  - `cAdvisor`: get metrics from your running containers
+  - `Node Exporter`: get metrics from your server
+- All the tools are shipped in a single `docker-compose.yml` file
+- Data is stored in subfolders of the stack. You can easily backup and restore the data.
+- We include some preconfigured Grafana dashboards and alerts
+
+## Full source code
+
+[Find the full `lostdock-monitoring` stack source code on GitHub](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-monitoring)

@@ -1,5 +1,126 @@
-import { Callout } from 'nextra-theme-docs'
+import { Tabs, Tab, Callout } from 'nextra-theme-docs'
 
 # Getting Started
 
-To do
+The main goal of Lostdock is to make it easy to deploy and manage Docker Compose stacks on your server. VPS servers
+are ubiquitous and cheap. They are a great way to host your own services. The biggest problem is
+orchestration of services. Lostdock solves this problem by providing a simple CLI to deploy and manage Docker Compose stacks.
+
+## Installation
+
+```bash
+npm install -g lostdock
+```
+
+## Init a server
+
+Create a new Debian/Ubuntu VPS in your preferred cloud provider. Then init the server:
+
+```bash
+# After creating a new VPS, login via SSH
+lostdock login
+
+# Install Docker Compose and start the firewall.
+lostdock server init
+```
+
+## Deploying
+
+<Tabs items={['Deploy stack from GitHub', 'Deploy your own stack']} defaultIndex={0}>
+  <Tab>
+Once you have a server running, you can run a pre-configured stack from GitHub. For example, let's run our [lostdock-traefik](/docs/core-stacks/lostdock-traefik) reverse proxy stack with auto generated TLS certificates
+
+```bash
+export TRAEFIK_HOST=traefik.example.com
+export TRAEFIK_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
+export LETSENCRYPT_EMAIL=example@example.com
+
+# Start Traefik reverse proxy
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-traefik
+```
+
+We also recommend running the following stacks: [lostdock-monitoring](/docs/core-stacks/lostdock-monitoring) (log and metric aggregation and visualization stack) and [lostdock-portainer](/docs/core-stacks/lostdock-portainer) (container management).
+
+  </Tab>
+  <Tab>
+    You can also deploy your own stack. Create a new stack with `lostdock stacks create` and then edit the `.env` file to configure the hostname.
+
+```
+lostdock stacks create --name example
+cd example
+```
+
+Edit `.env` hostname:
+
+```yaml filename=".env"
+# This file is used to store environment variables for the stack.
+# It is not checked into source control.
+# You can use the environment variables in your docker-compose.yml file.
+
+# The domain name for the stack. Used in the docker-compose.yml service traefik configuration.
+HOST="example.lostdock.com"
+```
+
+Review the `docker-compose.yml` file:
+
+```yaml filename="docker-compose.yml"
+version: "3.9"
+
+networks:
+  # Network where traefik reverse proxy is running
+  proxy:
+    external: true
+
+services:
+  # Simple web service. It uses lostdock-traefik for the dynamic reverse proxy with automated TLS          certificates.
+  whoami:
+    image: "nginx"
+    volumes:
+      - ./src:/usr/share/nginx/html
+
+    # Expose the environment variables to your service
+    env_file:
+      - ./.env
+
+    # Always restart the container if it fails
+    restart: always
+    # We can change the amount of containers running at the same time
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+
+    # We need to add the service to the traefik network
+    networks:
+      - proxy
+
+    # Traefik configuration is fetched dynamically from the labels of other running containers
+    labels:
+      - traefik.enable=true
+      # Don't forget to add an A record pointing to the server IP address to your DNS.
+      - traefik.http.routers.example.rule=Host(`${HOST}`)
+      - traefik.http.routers.example.service=example
+      - traefik.http.routers.example.entrypoints=websecure
+      - traefik.http.routers.example.tls=true
+      - traefik.http.routers.example.tls.certresolver=letsencrypt
+      - traefik.http.services.example.loadbalancer.server.port=80
+```
+
+Finally, install the stack:
+
+```bash
+lostdock stacks install
+```
+
+      It will perform the following actions:
+
+      - Run `./install-local.sh` (validate configuration)
+      - Push stack configuration files to server
+      - Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
+      - Run `docker compose up`.
+
+      </Tab>
+
+  </Tabs>

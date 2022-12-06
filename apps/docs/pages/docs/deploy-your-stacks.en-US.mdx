@@ -2,4 +2,136 @@ import { Callout } from 'nextra-theme-docs'
 
 # Deploy your stacks
 
-To do
+You can also deploy your own stack. Create a new stack with `lostdock stacks create` and then edit the `.env` file to configure the hostname.
+
+```
+lostdock stacks create --name example
+cd example
+```
+
+The example folder contains a basic example of an Nginx web server to get started. You can add more services to the stack using your own images later.
+
+## .env file
+
+The `.env` file is a convention to store environment variables. Docker Compose automatically reads this file and allows you to interpolate
+the values directly in the `docker-compose.yml` file, which is a powerful feature.
+
+Now, let's edit the hostname for the service to something that you control. Don't forget to point DNS A records
+to the public IP address of your server.
+
+```yaml filename=".env"
+# This file is used to store environment variables for the stack.
+# It is not checked into source control.
+# You can use the environment variables in your docker-compose.yml file.
+
+# The domain name for the stack. Used in the docker-compose.yml service traefik configuration.
+HOST="example.lostdock.com"
+```
+
+## docker-compose.yml file
+
+Review the `docker-compose.yml` file. It contains the configuration for the stack. You can add more services to the stack.
+
+```yaml filename="docker-compose.yml"
+version: "3.9"
+
+networks:
+  # Network where traefik reverse proxy is running
+  proxy:
+    external: true
+
+services:
+  # Simple web service. It uses lostdock-traefik for the dynamic reverse proxy with automated TLS          certificates.
+  whoami:
+    image: "nginx"
+    volumes:
+      - ./src:/usr/share/nginx/html
+
+    # Expose the environment variables to your service
+    env_file:
+      - ./.env
+
+    # Always restart the container if it fails
+    restart: always
+    # We can change the amount of containers running at the same time
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+
+    # We need to add the service to the traefik network
+    networks:
+      - proxy
+
+    # Traefik configuration is fetched dynamically from the labels of other running containers
+    labels:
+      - traefik.enable=true
+      # Don't forget to add an A record pointing to the server IP address to your DNS.
+      - traefik.http.routers.example.rule=Host(`${HOST}`)
+      - traefik.http.routers.example.service=example
+      - traefik.http.routers.example.entrypoints=websecure
+      - traefik.http.routers.example.tls=true
+      - traefik.http.routers.example.tls.certresolver=letsencrypt
+      - traefik.http.services.example.loadbalancer.server.port=80
+```
+
+### Install the stack:
+
+```bash
+lostdock stacks install
+```
+
+      It will perform the following actions:
+
+      - Run `./install-local.sh` (validate configuration)
+      - Push stack configuration files to server
+      - Run `./install-server.sh` (preparation before starting stack. E.g. change permissions, create volumes, networks, etc)
+      - Run `docker compose up`.
+
+## Deploying your own images
+
+You can sign up to DockerHub and push your own images to the registry. You can also use a private registry (paid feature). We might consider adding a free private registry in the future.
+
+Your images could be built on your CI/CD (e.g. GitHub Actions) and pushed to the registry. You can also build the images on the server using `docker build` and `docker push`.
+
+## Updating your stack
+
+Store a `IMAGE_TAG` environment variable in the `.env` file.
+
+The `docker-compose.yml` service image can contain an environment variable to be used as a template. The image tag will be replaced with the value of the environment variable.
+
+```yaml filename="docker-compose.yml"
+...
+services:
+  example:
+    image: "myorg/example:${IMAGE_TAG}"
+...
+```
+
+You can update the stack by running:
+
+```bash
+lostdock stacks env set --stack example --key IMAGE_TAG --value 1.0.0
+lostdock stacks up --stack example
+```
+
+## CI/CD example
+
+Checkout the [GitHub Actions workflow](https://github.com/carlosbaraza/lostdock/blob/main/.github/workflows/release.yml#L87-L97) we use to deploy these docs:
+
+In a gist, the workflow is setting up the SSH key, building the Docker image, and pushing it to DockerHub registry. Then we
+run the following commands to deploy the latest version of the stack.
+
+```bash
+cd ./apps/docs/deployments/production
+npm i -g lostdock
+lostdock login --host lostdock.com --privateKeyPath ~/.ssh/id_rsa
+lostdock stacks env pull --silent
+lostdock stacks env set --local --key HOSTNAME --value lostdock.com
+lostdock stacks env set --local --key VERSION --value ${{ env.VERSION }}
+lostdock stacks env set --local --key ENV --value production
+lostdock stacks push
+lostdock stacks up
+```
+
+However, you can use any CI/CD tool you want, or any set of commands to deploy your stack.

@@ -2,4 +2,108 @@ import { Callout } from 'nextra-theme-docs'
 
 # Stack management basics
 
-To do
+## `lostdock stacks`
+
+```markdown
+  Usage
+    $ lostdock stacks <command>
+
+  Manage your stacks on the server
+
+  Commands:
+    create ············· Create the basic configuration files for a stack (.lostdockrc.json,
+                         docker-compose.yml, .env). Nothing will be deployed to the server.
+    pull ··············· Pull all the remote stack files to the local stack folder. This will
+                         overwrite any local changes.
+    push ··············· Push the stack configuration to the server. All the files in the stack
+                         directory will be uploaded to the server. It is recommended to have a
+                         folder with the minimal data needed to run the stack: docker-compose.yml,
+                         .env, etc.
+    env ················ Manage your stack .env files on the server
+    install ············ Install the current folder stack in your server
+    install-from-git ··· Clone the repository and install the stack
+    up ················· Run `docker compose up` for the stack in the server
+    down ··············· Run `docker compose down` for the stack in the server
+    compose ············ Run `docker compose` for the stack in the server. You can specify any
+                         docker compose command after this command.
+
+  Options:
+    --help, -h ········· Show help
+```
+
+## `lostdock stacks up`
+
+```markdown
+  Usage
+    $ lostdock stacks up
+
+  Run `docker compose up` for the stack in the server
+
+
+  Options:
+    --stack, -s ········ stack name (e.g. example-stack-production)
+    --help, -h ········· Show help
+```
+
+## `lostdock stacks down`
+
+```markdown
+  Usage
+    $ lostdock stacks down
+
+  Run `docker compose down` for the stack in the server
+
+
+  Options:
+    --stack, -s ········ stack name (e.g. example-stack-production)
+    --help, -h ········· Show help
+```
+
+## `lostdock stacks push`
+
+```markdown
+  Usage
+    $ lostdock stacks push
+
+  Push the stack configuration to the server. All the files in the stack directory will be uploaded to the server. It is recommended to have a folder with the minimal data needed to run the stack: docker-compose.yml, .env, etc.
+
+
+  Options:
+    --stack, -s ········ stack name (e.g. example-stack-production)
+    --help, -h ········· Show help
+```
+
+## `lostdock stacks pull`
+
+```markdown
+  Usage
+    $ lostdock stacks pull
+
+  Pull all the remote stack files to the local stack folder. This will overwrite any local changes.
+
+
+  Options:
+    --stack, -s ········ stack name (e.g. example-stack-production)
+    --help, -h ········· Show help
+```
+
+## `lostdock stacks env`
+
+```markdown
+  Usage
+    $ lostdock stacks env <command>
+
+  Manage your stack .env files on the server
+
+  Commands:
+    pull ··············· Download the current .env file
+    push ··············· Upload the local .env file
+    view ··············· View the current remote .env file
+    set ················ Set an environment variable in your remote stack. The stack will be
+                         restarted.
+    unset ·············· Unset an environment variable in your remote stack. The stack will be
+                         restarted.
+
+  Options:
+    --help, -h ········· Show help
+```

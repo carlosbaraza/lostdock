@@ -89,7 +89,7 @@ networks:
 
 services:
   # Simple web service. It uses lostdock-traefik for the dynamic reverse proxy with automated TLS          certificates.
-  whoami:
+  ${stackName}:
     image: "nginx"
     volumes:
       - ./src:/usr/share/nginx/html

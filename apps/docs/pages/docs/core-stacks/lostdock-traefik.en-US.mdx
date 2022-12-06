@@ -2,4 +2,35 @@ import { Callout } from 'nextra-theme-docs'
 
 # lostdock-traefik
 
-TODO
+We preconfigured a Traefik reverse proxy with auto generated TLS certificates. It also includes a basic auth middleware.
+
+<Callout>
+    This stack is highly recommended, as you need a reverse proxy to use the other stacks exposing an HTTP service. In the future
+    we might support other reverse proxies, but at the moment, we thought
+    that Traefik was a great piece of Software that suited most needs.
+</Callout>
+
+## Usage
+
+```bash
+export TRAEFIK_HOST=traefik.example.com
+export TRAEFIK_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
+export LETSENCRYPT_EMAIL=example@example.com
+
+# Start Traefik reverse proxy
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-traefik
+```
+
+## Features
+
+- [x] Traefik reverse proxy
+- [x] Service discovery with Docker labels
+- [x] Auto generated TLS certificates with Let's Encrypt
+- [x] Basic auth middleware
+- [x] Traefik dashboard
+
+## Full source code
+
+[Find the full `lostdock-traefik` stack source code on GitHub](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-traefik)

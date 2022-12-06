@@ -2,4 +2,22 @@ import { Callout } from 'nextra-theme-docs'
 
 # lostdock-portainer
 
-TODO
+We preconfigured a [Portainer](https://www.portainer.io/) stack. It's a simple way to manage your Docker environment with a useful UI Dashboard.
+
+<Callout>
+    This stack is not mandatory. We consider it useful for beginners or people that want to have a simple UI to manage mundane tasks like restarting an app.
+</Callout>
+
+## Usage
+
+```bash
+export PORTAINER_HOST=portainer.example.com
+
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-portainer
+```
+
+## Full source code
+
+[Find the full `lostdock-portainer` stack source code on GitHub](https://github.com/carlosbaraza/lostdock/tree/main/packages/lostdock-portainer)

@@ -2,4 +2,28 @@ import { Callout } from 'nextra-theme-docs'
 
 # Deploy pre-configured stacks
 
-To do
+## Deploy stack from a GitHub repository
+
+Once you have a server running, you can run a pre-configured stack from GitHub. For example, let's run our [lostdock-traefik](/docs/core-stacks/lostdock-traefik) reverse proxy stack with auto generated TLS certificates:
+
+```bash
+export TRAEFIK_HOST=traefik.example.com
+export TRAEFIK_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
+export LETSENCRYPT_EMAIL=example@example.com
+
+# Start Traefik reverse proxy
+lostdock stacks install-from-git \
+    --url https://github.com/carlosbaraza/lostdock.git \
+    --path ./packages/lostdock-traefik
+```
+
+We also recommend running the following stacks: [lostdock-monitoring](/docs/core-stacks/lostdock-monitoring) (log and metric aggregation and visualization stack) and [lostdock-portainer](/docs/core-stacks/lostdock-portainer) (container management).
+
+## Core stacks
+
+We bundled some popular stacks that we consider are very useful.
+
+- [lostdock-traefik](/docs/core-stacks/lostdock-traefik) - Traefik reverse proxy with auto generated TLS certificates
+- [lostdock-monitoring](/docs/core-stacks/lostdock-monitoring) - Log and metric aggregation and visualization stack
+- [lostdock-portainer](/docs/core-stacks/lostdock-portainer) - Container management
+- More coming soon... Pull requests are welcome!
