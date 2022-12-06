@@ -8,6 +8,7 @@ source .env
 
 main() {
     echo "Setting the right permissions"
+    mkdir -p data
     chown -R 10001:10001 data
 }
 
