@@ -1,3 +1,4 @@
+import fs from "fs";
 import chalk from "chalk";
 import { NodeSSH } from "node-ssh";
 import path from "path";
@@ -26,10 +27,13 @@ export const install = async ({
 }) => {
   const remotePath = path.join(config().server.stacksPath, stackName);
 
-  setStatus('Running "install-local.sh" script');
-  await execLocal("./install-local.sh", {
-    log,
-  });
+  const installLocalPath = path.join(process.cwd(), "install-local.sh");
+  if (fs.existsSync(installLocalPath)) {
+    setStatus('Running "install-local.sh" script');
+    await execLocal("./install-local.sh", {
+      log,
+    });
+  }
 
   setStatus(`Uploading stack files to the server at "${remotePath}"`);
   await ssh.putDirectory(".", remotePath, {
@@ -48,14 +52,19 @@ export const install = async ({
   });
 
   setStatus('Running "install-server.sh" script');
-  await exec(ssh, `chmod +x ./install-server.sh`, {
-    cwd: remotePath,
-    log,
-  });
-  await exec(ssh, `./install-server.sh`, {
-    cwd: remotePath,
-    log,
-  });
+  await exec(
+    ssh,
+    `
+if [ -f ./install-server.sh ]; then
+  chmod +x ./install-server.sh
+  ./install-server.sh
+fi
+  `,
+    {
+      cwd: remotePath,
+      log,
+    }
+  );
 
   setStatus("Starting stack (docker compose up -d --force-recreate)");
   await exec(ssh, `docker compose up -d --force-recreate`, {
