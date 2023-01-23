@@ -29,6 +29,13 @@ export default command({
       description: "Show help",
       type: "boolean",
     },
+    {
+      key: "ignore",
+      type: "string",
+      alias: "i",
+      isRequired: false,
+      description: 'Ignore paths matching JS regex (e.g. -i "/postgres/")',
+    },
   ],
   commandDepth: 2,
   run: async (cli, command) => {
