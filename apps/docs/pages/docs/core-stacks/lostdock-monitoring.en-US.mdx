@@ -17,6 +17,10 @@ same Grafana environment.
 export GRAFANA_HOST=grafana.example.com
 export NETDATA_HOST=netdata.example.com
 export NETDATA_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
+export PROMETHEUS_HOST=prometheus.example.com
+export PROMETHEUS_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
+export ALERTMANAGER_HOST=alertmanager.example.com
+export ALERTMANAGER_BASIC_AUTH="$(echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g)"
 
 lostdock stacks install-from-git \
     --url https://github.com/carlosbaraza/lostdock.git \
@@ -36,6 +40,12 @@ lostdock stacks install-from-git \
 - All the tools are shipped in a single `docker-compose.yml` file
 - Data is stored in subfolders of the stack. You can easily backup and restore the data.
 - We include some preconfigured Grafana dashboards and alerts
+
+## Configuration
+
+In order to configure the different components, you can SSH into your server and edit all the configuration files and the `docker-compose.yml` under `~/stacks/lostdock-monitoring`. Once you are done, restart the stack running `docker compose -d --force-recreate` from the stack root folder in the server.
+
+Alternatively, you can create a new folder in your local machine and run `lostdock stacks pull --stack lostdock-monitoring` to download the stack files. Then, you can edit the files and run `lostdock stacks pull --stack lostdock-monitoring` to download the stack configuration from the server. You can edit locally and then push the changes with `lostdock stacks push` and run the stack with `lostdock stacks up`.
 
 ## Full source code
 

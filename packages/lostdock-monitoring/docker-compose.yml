@@ -65,22 +65,32 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - 9090:9090
+    # ports:
+    #   - 9090:9090
     links:
       - cadvisor:cadvisor
       - alertmanager:alertmanager
-#      - pushgateway:pushgateway
+    #  - pushgateway:pushgateway
     depends_on:
       - cadvisor
-#      - pushgateway
+    # - pushgateway
     networks:
       - monitoring
+      - proxy
     restart: always
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.hostname == ${HOSTNAME}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_HOST}`)"
+      - "traefik.http.routers.prometheus.entrypoints=websecure"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.prometheus.middlewares=prometheus"
+      - "traefik.http.middlewares.prometheus.basicauth.users=${PROMETHEUS_BASIC_AUTH}"
+      - "traefik.docker.network=proxy"
 
   node-exporter:
     image: quay.io/prometheus/node-exporter:latest
@@ -112,14 +122,25 @@ services:
       - ./alertmanager/data/:/alertmanager/
     networks:
       - monitoring
+      - proxy
     restart: always
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
+    #  deploy:
+    #    placement:
+    #      constraints:
+    #        - node.hostname == ${HOSTNAME}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alertmanager.rule=Host(`${ALERTMANAGER_HOST}`)"
+      - "traefik.http.routers.alertmanager.entrypoints=websecure"
+      - "traefik.http.routers.alertmanager.tls=true"
+      - "traefik.http.routers.alertmanager.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alertmanager.middlewares=alertmanager"
+      - "traefik.http.middlewares.alertmanager.basicauth.users=${ALERTMANAGER_BASIC_AUTH}"
+      - "traefik.docker.network=proxy"
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
     volumes:
@@ -179,7 +200,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.netdata.rule=Host(`${NETDATA_HOST}`)"
-      - "traefik.http.services.netdata.loadbalancer.server.port=19999"
       - "traefik.http.routers.netdata.middlewares=netdata"
       - "traefik.http.middlewares.netdata.basicauth.users=${NETDATA_BASIC_AUTH}"
       - "traefik.http.routers.netdata.entrypoints=websecure"
