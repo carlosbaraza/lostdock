@@ -1,5 +1,16 @@
 # lostdock-monitoring
 
+## 0.2.0
+
+### Minor Changes
+
+- 94cb9a0: Require setting the hostname for prometheus and alertmanager web endpoints
+
+### Patch Changes
+
+- Updated dependencies [628d601]
+  - lostdock@0.4.1
+
 ## 0.1.9
 
 ### Patch Changes
