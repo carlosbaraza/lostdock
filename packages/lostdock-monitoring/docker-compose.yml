@@ -7,7 +7,7 @@ networks:
 
 services:
   loki:
-    image: grafana/loki:2.6.1
+    image: grafana/loki:2.7.3
     volumes:
       - ./loki/config:/etc/loki
       - ./loki/data:/loki
@@ -19,7 +19,7 @@ services:
       - monitoring
   
   promtail:
-    image: grafana/promtail:2.6.1
+    image: grafana/promtail:2.7.3
     volumes:
       - /var/log:/var/log
       - ./promtail:/etc/promtail
@@ -31,7 +31,7 @@ services:
       - monitoring
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:9.3.6
     user: "472"
     depends_on:
       - prometheus
@@ -55,7 +55,7 @@ services:
       - "traefik.docker.network=proxy"
 
   prometheus:
-    image: prom/prometheus:v2.36.2
+    image: prom/prometheus:v2.42.0
     user: "1000:1000"
     volumes:
       - ./prometheus/config:/etc/prometheus/
@@ -142,7 +142,7 @@ services:
       - "traefik.docker.network=proxy"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.47.1
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -178,7 +178,7 @@ services:
 #      - monitoring
 
   netdata:
-    image: netdata/netdata:v1.36.1
+    image: netdata/netdata:v1.37.1
     restart: always
     hostname: ${NETDATA_HOST}
     cap_add:
