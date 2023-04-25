@@ -20,6 +20,9 @@ main() {
         "loki-batch-size": "400",
         "loki-batch-wait": "1s",
         "loki-external-labels": "hostname=$(hostname)"
+        "max-size": "50m",
+        "max-file": "1",
+        "keep-file": "false"
     }
 }
 EOF
