@@ -14,6 +14,6 @@ receivers:
     # slack_configs:
     #   - send_resolved: true
     #     channel: 'YOUR_CHANNEL'
-    #     text: "{{ range .Alerts }}{{ .Annotations.summary }}\n*Description*: {{ .Annotations.description }}\n*Details*:\n{{ range .Labels.SortedPairs }} - *{{ .Name }}*: {{ .Value }}\n{{ end }}{{ end }}"
+    #     text: "{{ range .Alerts }}@here {{ .Annotations.summary }}\n*Description*: {{ .Annotations.description }}\n*Details*:\n{{ range .Labels.SortedPairs }} - *{{ .Name }}*: {{ .Value }}\n{{ end }}{{ end }}"
     #     external_url: 'YOUR_EXTERNAL_URL'
     #     api_url: 'YOUR_SLACK_WEBHOOK_URL'
