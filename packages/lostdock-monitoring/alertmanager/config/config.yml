@@ -1,10 +1,19 @@
+global:
+  # In most cases, Prometheus sends alert updates periodically (usually every evaluation interval, which is often set to 1 minute), so alerts will not resolve automatically unless the condition that triggered them has been resolved. The resolve_timeout setting acts as a safety mechanism to prevent stale alerts from staying active indefinitely if updates are not received.
+  # resolve_timeout: 5m
+
 route:
+  group_by: ['alertname', 'instance']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
   receiver: 'slack'
 
 receivers:
   - name: 'slack'
-#       slack_configs:
-#           - send_resolved: true
-#             username: '<username>'
-#             channel: '#<channel-name>'
-#             api_url: '<incomming-webhook-url>'
+    # slack_configs:
+    #   - send_resolved: true
+    #     channel: 'YOUR_CHANNEL'
+    #     text: "{{ range .Alerts }}{{ .Annotations.summary }}\n*Description*: {{ .Annotations.description }}\n*Details*:\n{{ range .Labels.SortedPairs }} - *{{ .Name }}*: {{ .Value }}\n{{ end }}{{ end }}"
+    #     external_url: 'YOUR_EXTERNAL_URL'
+    #     api_url: 'YOUR_SLACK_WEBHOOK_URL'
